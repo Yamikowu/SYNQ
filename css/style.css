@@ -41,8 +41,8 @@ ol {
   --color-bg-2:      #111111;   /* 次層背景 */
   --color-bg-3:      #1a1a1a;   /* 卡片底色 */
   --color-ice:       #7dd3fc;   /* 冰藍點綴色 */
-  --color-neon:      #ff6b2b;   /* 霓虹橘點綴色 */
-  --color-neon-deep: #ff3d00;   /* 深橘（按鈕漸層終點） */
+  --color-neon:      #a855f7;   /* 霓虹紫點綴色 */
+  --color-neon-deep: #9333ea;   /* 深紫（按鈕漸層終點） */
   --color-text:      #e5e7eb;   /* 主要文字 */
   --color-text-muted:#6b7280;   /* 次要文字 */
 
@@ -101,10 +101,10 @@ body::before {
   50%       { box-shadow: 0 0 18px #7dd3fcaa, 0 0 40px #7dd3fc44; }
 }
 
-/* 霓虹橘發光脈動 */
+/* 霓虹紫發光脈動 */
 @keyframes neon-pulse {
-  0%, 100% { box-shadow: 0 0 8px #ff6b2b55, 0 0 20px #ff6b2b22; }
-  50%       { box-shadow: 0 0 18px #ff6b2baa, 0 0 40px #ff6b2b44; }
+  0%, 100% { box-shadow: 0 0 8px #a855f755, 0 0 20px #a855f722; }
+  50%       { box-shadow: 0 0 18px #a855f7aa, 0 0 40px #a855f744; }
 }
 
 /* 浮動效果（英雄圖片） */
@@ -146,18 +146,18 @@ body::before {
               0 0 30px rgba(125, 211, 252, 0.12);
 }
 
-/* --- 6.3 Waitlist 霓虹橘發光按鈕 --- */
+/* --- 6.3 Waitlist 霓虹紫發光按鈕 --- */
 .btn-waitlist {
   background: linear-gradient(135deg, var(--color-neon), var(--color-neon-deep));
-  box-shadow: 0 0 12px rgba(255, 107, 43, 0.4),
-              0 0 28px rgba(255, 107, 43, 0.2);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.4),
+              0 0 28px rgba(168, 85, 247, 0.2);
   transition: all 0.3s ease;
   letter-spacing: 0.04em;
 }
 
 .btn-waitlist:hover {
-  box-shadow: 0 0 20px rgba(255, 107, 43, 0.7),
-              0 0 50px rgba(255, 107, 43, 0.35);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.7),
+              0 0 50px rgba(168, 85, 247, 0.35);
   transform: translateY(-2px) scale(1.03);
 }
 
@@ -165,7 +165,7 @@ body::before {
 .hero-bg {
   background:
     radial-gradient(ellipse 70% 60% at 50% 30%, rgba(125, 211, 252, 0.07) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 50% at 80% 70%, rgba(255, 107, 43, 0.06)  0%, transparent 60%),
+    radial-gradient(ellipse 40% 50% at 80% 70%, rgba(168,  85, 247, 0.06) 0%, transparent 60%),
     var(--color-bg);
 }
 
@@ -183,7 +183,7 @@ body::before {
   background: linear-gradient(
     135deg,
     rgba(125, 211, 252, 0.05) 0%,
-    rgba(255, 107, 43,  0.04) 100%
+    rgba(168,  85, 247, 0.04) 100%
   );
   border: 1px dashed rgba(125, 211, 252, 0.2);
   position: relative;
@@ -218,7 +218,7 @@ body::before {
     90deg,
     transparent,
     rgba(125, 211, 252, 0.3),
-    rgba(255, 107, 43,  0.2),
+    rgba(168,  85, 247, 0.2),
     transparent
   );
 }
@@ -339,7 +339,14 @@ body::before {
   background: linear-gradient(90deg, var(--color-ice), var(--color-neon));
   z-index: 10000;
   transition: width 0.1s linear;
-  width: 0%; /* 初始值，由 JS 動態控制 */
+  width: 0%;
+}
+
+/* ── 8.1 Waitlist 輸入欄文字顏色修正 ────────────────── */
+/* 部分瀏覽器的 input 原生顏色不會被 Tailwind CDN 覆蓋 */
+#waitlist-email {
+  color: #ffffff;
+  caret-color: #7dd3fc; /* 游標顏色改為冰藍 */
 }
 
 /* ── 8. 自訂捲軸 ───────────────────────────────────── */
