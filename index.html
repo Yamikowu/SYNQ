@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEXUS — AI 硬體生態系</title>
+  <meta name="description" content="NEXUS 是次世代 AI 硬體生態系品牌，融合人工智慧與實體觸感，重新定義競技體驗。探索 AI 仿生溫控競技手把、OLED 機械鍵盤與更多前瞻產品。">
+
+  <!-- ===================== Tailwind CSS CDN ===================== -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'ice':    '#7dd3fc',
+            'neon':   '#ff6b2b',
+            'dark':   '#0a0a0a',
+            'dark2':  '#111111',
+            'dark3':  '#1a1a1a',
+            'glass':  'rgba(255,255,255,0.04)',
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+            mono: ['JetBrains Mono', 'ui-monospace'],
+          },
+          keyframes: {
+            'glow-pulse': {
+              '0%, 100%': { boxShadow: '0 0 8px #7dd3fc55, 0 0 20px #7dd3fc22' },
+              '50%':       { boxShadow: '0 0 18px #7dd3fcaa, 0 0 40px #7dd3fc44' },
+            },
+            'neon-pulse': {
+              '0%, 100%': { boxShadow: '0 0 8px #ff6b2b55, 0 0 20px #ff6b2b22' },
+              '50%':       { boxShadow: '0 0 18px #ff6b2baa, 0 0 40px #ff6b2b44' },
+            },
+            'float': {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%':       { transform: 'translateY(-14px)' },
+            },
+            'scanline': {
+              '0%':   { transform: 'translateY(-100%)' },
+              '100%': { transform: 'translateY(100%)' },
+            },
+          },
+          animation: {
+            'glow-pulse': 'glow-pulse 2.5s ease-in-out infinite',
+            'neon-pulse': 'neon-pulse 2.5s ease-in-out infinite',
+            'float':      'float 5s ease-in-out infinite',
+            'scanline':   'scanline 3s linear infinite',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- ===================== Google Fonts ===================== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- ===================== AOS (Animate On Scroll) ===================== -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+  <!-- ===================== 自訂樣式表（關注點分離） ===================== -->
+  <!-- 所有自訂樣式已移至 css/style.css -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body class="antialiased">
+
+  <!-- =====================================================
+       滾動進度指示條
+  ====================================================== -->
+  <!-- 滾動進度指示條（寬度由 js/script.js 動態控制） -->
+  <div id="scroll-bar"></div>
+
+  <!-- =====================================================
+       HEADER — 頂部導覽列
+       固定置頂，毛玻璃半透明背景，含漢堡選單
+  ====================================================== -->
+  <header class="glass-nav fixed top-0 left-0 right-0 z-50">
+    <nav class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+
+        <!-- ── Logo ── -->
+        <a href="index.html" class="flex items-center gap-2 group" aria-label="NEXUS 首頁">
+          <div class="w-7 h-7 relative">
+            <div class="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-0.5">
+              <div class="bg-ice rounded-sm animate-glow-pulse"></div>
+              <div class="bg-white/20 rounded-sm"></div>
+              <div class="bg-white/20 rounded-sm"></div>
+              <div class="bg-neon rounded-sm animate-neon-pulse"></div>
+            </div>
+          </div>
+          <span class="text-white font-black text-xl tracking-[0.15em] font-mono group-hover:text-ice transition-colors duration-300">NEXUS</span>
+        </a>
+
+        <!-- ── 桌面版中間選單 ── -->
+        <ul class="hidden md:flex items-center gap-8" role="list">
+          <li><a href="controller.html" class="text-sm font-medium text-gray-400 hover:text-ice transition-colors duration-200 tracking-wide">Controller</a></li>
+          <li><a href="keyboard.html" class="text-sm font-medium text-gray-400 hover:text-ice transition-colors duration-200 tracking-wide">Keyboard</a></li>
+          <li><a href="macro.html" class="text-sm font-medium text-gray-400 hover:text-ice transition-colors duration-200 tracking-wide">Macro</a></li>
+          <li><a href="software.html" class="text-sm font-medium text-gray-400 hover:text-ice transition-colors duration-200 tracking-wide">Software</a></li>
+          <li><a href="coming.html" class="text-sm font-medium text-gray-400 hover:text-ice transition-colors duration-200 tracking-wide">Coming Soon</a></li>
+        </ul>
+
+        <!-- ── 右側 CTA + 漢堡 ── -->
+        <div class="flex items-center gap-4">
+          <a href="#waitlist" class="btn-waitlist hidden md:inline-flex items-center gap-2 px-5 py-2 rounded-lg text-white text-sm font-semibold">
+            Join Waitlist
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+
+          <!-- 漢堡選單按鈕 (行動版) -->
+          <button id="ham-btn" class="md:hidden flex flex-col justify-center gap-[6px] w-8 h-8 focus:outline-none" aria-label="開啟選單" aria-expanded="false">
+            <span class="ham-line block h-px bg-white w-6"></span>
+            <span class="ham-line block h-px bg-white w-6"></span>
+            <span class="ham-line block h-px bg-white w-4"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── 行動版展開選單 ── -->
+      <div id="mobile-menu" class="md:hidden" role="navigation" aria-label="行動版選單">
+        <div class="py-4 border-t border-white/05 flex flex-col gap-1">
+          <a href="controller.html"  class="px-3 py-3 text-sm text-gray-300 hover:text-ice hover:bg-white/05 rounded-lg transition-all">Controller</a>
+          <a href="keyboard.html" class="px-3 py-3 text-sm text-gray-300 hover:text-ice hover:bg-white/05 rounded-lg transition-all">Keyboard</a>
+          <a href="macro.html" class="px-3 py-3 text-sm text-gray-300 hover:text-ice hover:bg-white/05 rounded-lg transition-all">Macro</a>
+          <a href="software.html" class="px-3 py-3 text-sm text-gray-300 hover:text-ice hover:bg-white/05 rounded-lg transition-all">Software</a>
+          <a href="coming.html"   class="px-3 py-3 text-sm text-gray-300 hover:text-ice hover:bg-white/05 rounded-lg transition-all">Coming Soon</a>
+          <div class="pt-3 pb-1">
+            <a href="#waitlist" class="btn-waitlist flex items-center justify-center gap-2 w-full py-3 rounded-lg text-white text-sm font-semibold">
+              Join Waitlist →
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- =====================================================
+       MAIN — 主內容區塊
+  ====================================================== -->
+  <main>
+
+    <!-- =====================================================
+         SECTION 1 — Hero (旗艦首屏)
+         主打 AI 仿生溫控競技手把，滿版視差設計
+    ====================================================== -->
+    <section id="hero" class="hero-bg min-h-screen flex flex-col items-center justify-center relative overflow-hidden pt-16">
+
+      <!-- 背景裝飾光暈 -->
+      <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full pointer-events-none"
+           style="background: radial-gradient(circle, rgba(125,211,252,0.06) 0%, transparent 70%);"></div>
+      <div class="absolute bottom-20 right-1/4 w-64 h-64 rounded-full pointer-events-none"
+           style="background: radial-gradient(circle, rgba(255,107,43,0.07) 0%, transparent 70%);"></div>
+
+      <!-- 頂部細節標籤 -->
+      <div class="flex items-center gap-3 mb-8" data-aos="fade-down" data-aos-duration="800">
+        <div class="h-px w-12 bg-ice/40"></div>
+        <span class="badge bg-ice/10 text-ice border border-ice/20">Next-Gen Hardware</span>
+        <div class="h-px w-12 bg-ice/40"></div>
+      </div>
+
+      <!-- 主副標題 -->
+      <div class="text-center px-6 max-w-5xl mx-auto">
+        <h1 class="hero-title text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black mb-6"
+            data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
+          The Brain<br/>in Your Hands.
+        </h1>
+        <p class="text-gray-400 text-lg sm:text-xl md:text-2xl font-light max-w-2xl mx-auto leading-relaxed"
+           data-aos="fade-up" data-aos-duration="1000" data-aos-delay="250">
+          首創 AI 溫控手把與可更換軸體按鍵，<span class="text-ice font-medium">重新定義實體觸感。</span>
+        </p>
+      </div>
+
+      <!-- Hero CTA 按鈕組 -->
+      <div class="flex flex-col sm:flex-row items-center gap-4 mt-10"
+           data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
+        <a href="#waitlist" class="btn-waitlist px-8 py-4 rounded-xl text-white font-bold text-base tracking-wide">
+          Join the Waitlist
+        </a>
+        <a href="controller.html" class="px-8 py-4 rounded-xl border border-white/12 text-gray-300 hover:border-ice/40 hover:text-ice transition-all duration-300 font-medium text-base">
+          Explore Controller →
+        </a>
+      </div>
+
+      <!-- ── 產品圖片佔位區塊 ── -->
+      <div class="rounded-2xl aspect-[16/9] overflow-hidden ice-glow animate-float">
+        <img src="assets/img/controller.png" alt="AI Bionic Gamepad" class="w-full h-full object-cover">
+      </div>
+
+      <!-- <div class="mt-16 w-full max-w-3xl mx-auto px-6"
+           data-aos="fade-up" data-aos-duration="1200" data-aos-delay="550">
+        <div class="img-placeholder rounded-2xl aspect-[16/9] flex flex-col items-center justify-center ice-glow animate-float">
+          <div class="text-center"> -->
+            <!-- 手把圖示 SVG -->
+            <!-- <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 mx-auto mb-4 text-ice/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="0.8">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M11 4a1 1 0 011-1h.01a1 1 0 011 1v1a7 7 0 017 7v1a3 3 0 01-3 3h-1v1.5a1.5 1.5 0 01-3 0V16h-2v1.5a1.5 1.5 0 01-3 0V16H6a3 3 0 01-3-3v-1a7 7 0 017-7V4z"/>
+              <circle cx="8" cy="11" r="1" fill="currentColor"/>
+              <circle cx="10" cy="9" r="1" fill="currentColor"/>
+              <circle cx="10" cy="13" r="1" fill="currentColor"/>
+              <circle cx="12" cy="11" r="1" fill="currentColor"/>
+              <circle cx="16" cy="10" r="1.5" fill="currentColor" opacity="0.5"/>
+              <circle cx="18" cy="12" r="1.5" fill="currentColor" opacity="0.5"/>
+            </svg>
+            <p class="font-mono text-xs text-ice/50 tracking-widest">AI BIONIC GAMEPAD — PRODUCT RENDER</p>
+            <p class="font-mono text-xs text-white/20 tracking-widest mt-1">W: 800px · H: 450px</p>
+          </div>
+        </div>
+      </div> -->
+
+      <!-- 底部向下滾動提示 -->
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce"
+           data-aos="fade-up" data-aos-delay="900">
+        <span class="text-xs font-mono text-white/30 tracking-widest">SCROLL</span>
+        <div class="h-8 w-px bg-gradient-to-b from-ice/40 to-transparent"></div>
+      </div>
+    </section>
+
+    <!-- 區塊分隔線 -->
+    <div class="divider"></div>
+
+    <!-- =====================================================
+         SECTION 2 — Ecosystem Grid (生態系 Bento Box)
+         CSS Grid 組成的 Bento 排版，展示三款產品
+    ====================================================== -->
+    <section id="ecosystem" class="py-28 px-6 max-w-7xl mx-auto">
+
+      <!-- 區塊標題 -->
+      <div class="mb-16" data-aos="fade-up">
+        <span class="badge bg-neon/10 text-neon border border-neon/20 mb-4 inline-block">The Ecosystem</span>
+        <h2 class="text-4xl md:text-5xl font-black text-white">
+          One Ecosystem.<br/><span class="text-ice">Every Dimension.</span>
+        </h2>
+        <p class="mt-4 text-gray-400 text-lg max-w-xl">
+          可連動裝置，由統一神經中樞驅動，打造前所未有的沉浸感。
+        </p>
+      </div>
+
+      <!-- ── Bento Grid 容器 ── -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[280px]">
+
+        <!-- ── 格子 A (大): AI Smart Keyboard (跨 2 欄 × 2 列) ── -->
+        <article class="glass-card bento-large rounded-2xl p-8 flex flex-col justify-between relative overflow-hidden cursor-pointer"
+                 data-aos="fade-up" data-aos-delay="0">
+          <!-- 背景光暈 -->
+          <div class="absolute -top-12 -right-12 w-48 h-48 rounded-full pointer-events-none"
+               style="background: radial-gradient(circle, rgba(125,211,252,0.12) 0%, transparent 70%);"></div>
+
+          <div>
+            <span class="badge bg-ice/10 text-ice border border-ice/20 mb-4 inline-block">Featured</span>
+            <h3 class="text-2xl md:text-3xl font-bold text-white leading-tight mb-3">
+              AI Smart<br/>Keyboard
+            </h3>
+            <p class="text-gray-400 text-sm leading-relaxed max-w-xs">
+              逐鍵 OLED 鍵帽機械鍵盤，AI 自動切換 Layout。四層可程式化按鍵，配備低延遲 Gasket 軸座。
+            </p>
+          </div>
+
+          <!-- 產品圖片佔位 -->
+          <div class="img-placeholder rounded-xl h-36 mt-4 flex items-center justify-center">
+            <div class="text-center">
+              <img src="assets/img/keyboard.png" alt="AI Smart Keyboard" class="w-full h-full object-cover">
+              <!-- <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mx-auto text-ice/30 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                <rect x="2" y="6" width="20" height="13" rx="2" stroke="currentColor"/>
+                <path d="M6 10h1M9 10h1M12 10h1M15 10h1M18 10h1M6 13h1M9 13h3M15 13h1M18 13h1M6 16h12" stroke="currentColor" stroke-linecap="round"/>
+              </svg> -->
+              <!-- <span class="font-mono text-xs text-ice/30 tracking-widest">KEYBOARD RENDER</span> -->
+            </div>
+          </div>
+
+          <!-- 右下角箭頭 -->
+          <a href="keyboard.html" class="absolute bottom-7 right-7 w-10 h-10 rounded-full border border-ice/20 flex items-center justify-center text-ice hover:bg-ice/10 transition-all hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7v10"/>
+            </svg>
+          </a>
+        </article>
+
+        <!-- ── 格子 B (中): Macro Command Deck ── -->
+        <article class="glass-card bento-medium rounded-2xl p-7 flex flex-col justify-between relative overflow-hidden cursor-pointer"
+                 data-aos="fade-up" data-aos-delay="150">
+          <div class="absolute -bottom-8 -left-8 w-32 h-32 rounded-full pointer-events-none"
+               style="background: radial-gradient(circle, rgba(255,107,43,0.12) 0%, transparent 70%);"></div>
+
+          <div>
+            <span class="badge bg-neon/10 text-neon border border-neon/20 mb-3 inline-block">New</span>
+            <h3 class="text-xl font-bold text-white mb-2">Macro Command Deck</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              16 鍵觸覺回饋巨集控制台，配備旋鈕與滑桿，串接 AI 工作流自動化。
+            </p>
+          </div>
+
+          <!-- 圖示佔位 -->
+          <div class="img-placeholder rounded-xl h-28 mt-4 flex items-center justify-center">
+            <img src="assets/img/macro.png" alt="Macro Command Deck" class="w-full h-full object-cover">
+            <!-- <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-neon/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+              <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor"/>
+              <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor"/>
+              <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor"/>
+              <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor"/>
+            </svg> -->
+          </div>
+        </article>
+
+        <!-- ── 格子 C (中): Neural Synth ── -->
+        <article class="glass-card bento-medium rounded-2xl p-7 flex flex-col justify-between relative overflow-hidden cursor-pointer"
+                 data-aos="fade-up" data-aos-delay="300">
+          <div class="absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none"
+               style="background: radial-gradient(circle, rgba(125,211,252,0.09) 0%, transparent 70%);"></div>
+
+          <div>
+            <span class="badge bg-white/05 text-gray-500 border border-white/08 mb-3 inline-block">Coming Soon</span>
+            <h3 class="text-xl font-bold text-white mb-2">Neural Synth</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              50 點矩陣觸覺回饋合成器，以皮膚感知傳遞音樂、通知與 AI 提示。
+            </p>
+          </div>
+
+          <!-- 圖示佔位 -->
+          <div class="img-placeholder rounded-xl h-28 mt-4 flex items-center justify-center">
+            <img src="assets/img/synth.png" alt="Neural Synth" class="w-full h-full object-cover">
+            <!-- <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-ice/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12 0c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2z"/>
+            </svg> -->
+          </div>
+        </article>
+
+      </div><!-- / Bento Grid -->
+
+    </section>
+
+    <!-- 區塊分隔線 -->
+    <div class="divider mx-6 md:mx-20"></div>
+
+    <!-- =====================================================
+         SECTION 3 — Specs (規格數字展示列)
+    ====================================================== -->
+    <section id="specs" class="py-20 px-6 max-w-7xl mx-auto">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div class="glass-card rounded-xl p-6" data-aos="fade-up" data-aos-delay="0">
+          <div class="text-4xl font-black text-ice mb-1">0.3<span class="text-2xl">ms</span></div>
+          <div class="text-xs font-mono text-gray-500 tracking-widest uppercase">Trigger Latency</div>
+        </div>
+        <div class="glass-card rounded-xl p-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="text-4xl font-black text-white mb-1">AI<span class="text-ice text-2xl">×4</span></div>
+          <div class="text-xs font-mono text-gray-500 tracking-widest uppercase">Onboard Cores</div>
+        </div>
+        <div class="glass-card rounded-xl p-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="text-4xl font-black text-neon mb-1">36<span class="text-2xl">°C</span></div>
+          <div class="text-xs font-mono text-gray-500 tracking-widest uppercase">Thermal Control</div>
+        </div>
+        <div class="glass-card rounded-xl p-6" data-aos="fade-up" data-aos-delay="300">
+          <div class="text-4xl font-black text-white mb-1">72<span class="text-ice text-2xl">h</span></div>
+          <div class="text-xs font-mono text-gray-500 tracking-widest uppercase">Battery Life</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 區塊分隔線 -->
+    <div class="divider mx-6 md:mx-20"></div>
+
+    <!-- =====================================================
+         SECTION 4 — Software Hub (統一驅動軟體區塊)
+         左側文字 + 右側 UI 預覽圖
+    ====================================================== -->
+    <section id="software" class="py-28 px-6 max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+        <!-- 左側文字 -->
+        <div data-aos="fade-right" data-aos-duration="900">
+          <span class="badge bg-ice/10 text-ice border border-ice/20 mb-5 inline-block">Software Hub</span>
+          <h2 class="text-4xl md:text-5xl font-black text-white leading-tight mb-6">
+            One Hub.<br/>
+            <span class="text-ice">Infinite Control.</span>
+          </h2>
+          <p class="text-gray-400 text-lg leading-relaxed mb-8">
+            全新神經中樞驅動介面，統一管理所有 NEXUS 裝置。AI 自動配置按鍵映射、溫控模式與觸感強度，讓你專注於當下最重要的事。
+          </p>
+
+          <!-- 功能清單 -->
+          <ul class="space-y-3 mb-10">
+            <li class="flex items-center gap-3 text-gray-300 text-sm">
+              <span class="flex-shrink-0 w-5 h-5 rounded-full border border-ice/30 flex items-center justify-center">
+                <svg class="w-3 h-3 text-ice" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </span>
+              AI 一鍵配置最佳化按鍵方案
+            </li>
+            <li class="flex items-center gap-3 text-gray-300 text-sm">
+              <span class="flex-shrink-0 w-5 h-5 rounded-full border border-ice/30 flex items-center justify-center">
+                <svg class="w-3 h-3 text-ice" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </span>
+              跨裝置即時同步，零延遲切換
+            </li>
+            <li class="flex items-center gap-3 text-gray-300 text-sm">
+              <span class="flex-shrink-0 w-5 h-5 rounded-full border border-ice/30 flex items-center justify-center">
+                <svg class="w-3 h-3 text-ice" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </span>
+              開放 SDK，支援社群插件擴充
+            </li>
+          </ul>
+
+          <a href="software.html" class="inline-flex items-center gap-2 text-ice text-sm font-semibold hover:gap-4 transition-all duration-300 group">
+            探索 Software Hub
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </a>
+        </div>
+
+        <!-- 右側 Software UI 預覽圖佔位 -->
+        <div data-aos="fade-left" data-aos-duration="900" data-aos-delay="150">
+          <div class="software-preview rounded-2xl aspect-[16/10] flex flex-col items-center justify-center relative ice-glow">
+            <!-- 模擬 UI 元素 -->
+            <div class="absolute top-4 left-4 right-4 flex items-center gap-2">
+              <div class="w-2.5 h-2.5 rounded-full bg-red-500/60"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/60"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-green-500/60"></div>
+              <div class="flex-1 h-5 rounded bg-white/04 mx-2"></div>
+            </div>
+            <div class="absolute inset-0 top-10 p-4 flex flex-col gap-2.5">
+              <div class="flex gap-2 items-center">
+                <div class="w-20 h-full bg-white/03 rounded-lg border border-white/05 self-stretch"></div>
+                <div class="flex-1 flex flex-col gap-2">
+                  <div class="h-3 bg-ice/08 rounded w-2/3"></div>
+                  <div class="h-3 bg-white/05 rounded w-full"></div>
+                  <div class="h-3 bg-white/05 rounded w-4/5"></div>
+                  <div class="h-8 bg-ice/05 rounded-lg border border-ice/10 mt-1 flex items-center px-3">
+                    <div class="h-2 w-1/3 bg-ice/30 rounded"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="grid grid-cols-3 gap-2 mt-1">
+                <div class="h-14 bg-white/03 rounded-lg border border-white/05 flex flex-col items-center justify-center gap-1">
+                  <div class="w-4 h-4 rounded bg-ice/20"></div>
+                  <div class="h-1.5 w-8 bg-white/10 rounded"></div>
+                </div>
+                <div class="h-14 bg-neon/05 rounded-lg border border-neon/15 flex flex-col items-center justify-center gap-1">
+                  <div class="w-4 h-4 rounded bg-neon/30"></div>
+                  <div class="h-1.5 w-8 bg-white/10 rounded"></div>
+                </div>
+                <div class="h-14 bg-white/03 rounded-lg border border-white/05 flex flex-col items-center justify-center gap-1">
+                  <div class="w-4 h-4 rounded bg-white/10"></div>
+                  <div class="h-1.5 w-8 bg-white/10 rounded"></div>
+                </div>
+              </div>
+            </div>
+            <div class="relative z-10 text-center mt-28">
+              <span class="font-mono text-xs text-ice/30 tracking-widest">SOFTWARE UI PREVIEW</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 區塊分隔線 -->
+    <div class="divider"></div>
+
+    <!-- =====================================================
+         SECTION 5 — Waitlist CTA (招募名單呼籲)
+    ====================================================== -->
+    <section id="waitlist" class="py-28 px-6">
+      <div class="max-w-3xl mx-auto text-center" data-aos="fade-up" data-aos-duration="900">
+        <span class="badge bg-neon/10 text-neon border border-neon/20 mb-5 inline-block">Early Access</span>
+        <h2 class="text-4xl md:text-5xl font-black text-white mb-5 leading-tight">
+          Be First.<br/>
+          <span class="text-ice">Shape the Future.</span>
+        </h2>
+        <p class="text-gray-400 text-lg mb-10 leading-relaxed">
+          加入候補名單，搶先體驗 NEXUS 生態系，並享有早鳥獨家折扣與測試資格。
+        </p>
+        <form class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto" onsubmit="handleWaitlist(event)">
+          <input
+            type="email"
+            id="waitlist-email"
+            placeholder="your@email.com"
+            required
+            class="flex-1 bg-white/05 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-gray-500 text-sm
+                   focus:outline-none focus:border-ice/50 focus:bg-white/08 transition-all duration-300"
+          />
+          <button type="submit" class="btn-waitlist px-7 py-4 rounded-xl text-white font-bold text-sm whitespace-nowrap">
+            Join Now
+          </button>
+        </form>
+        <p id="waitlist-msg" class="mt-4 text-sm text-ice opacity-0 transition-opacity duration-500"></p>
+        <p class="mt-4 text-xs text-gray-600">不會發送垃圾郵件，隨時可取消訂閱。</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =====================================================
+       FOOTER — 頁尾
+       極簡多欄式版尾，含社群連結與版權宣告
+  ====================================================== -->
+  <footer class="border-t border-white/06 bg-dark">
+    <div class="max-w-7xl mx-auto px-6 py-16">
+
+      <!-- 上方欄位列 -->
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 mb-14">
+
+        <!-- 品牌欄 -->
+        <div class="col-span-2 lg:col-span-2">
+          <div class="flex items-center gap-2 mb-5">
+            <div class="w-6 h-6 relative">
+              <div class="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-0.5">
+                <div class="bg-ice rounded-sm"></div>
+                <div class="bg-white/15 rounded-sm"></div>
+                <div class="bg-white/15 rounded-sm"></div>
+                <div class="bg-neon rounded-sm"></div>
+              </div>
+            </div>
+            <span class="text-white font-black text-lg tracking-[0.15em] font-mono">NEXUS</span>
+          </div>
+          <p class="text-gray-500 text-sm leading-relaxed max-w-xs mb-6">
+            次世代 AI 硬體生態系。<br/>
+            融合人工智慧與實體觸感，重新定義你與科技的連結。
+          </p>
+          <!-- 社群 Icon -->
+          <div class="flex items-center gap-2" aria-label="社群媒體連結">
+            <!-- X (Twitter) -->
+            <a href="#" class="social-btn" aria-label="X (Twitter)">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <!-- Instagram -->
+            <a href="#" class="social-btn" aria-label="Instagram">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+            </a>
+            <!-- YouTube -->
+            <a href="#" class="social-btn" aria-label="YouTube">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </a>
+            <!-- GitHub -->
+            <a href="#" class="social-btn" aria-label="GitHub">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Products 欄 -->
+        <div>
+          <h4 class="text-xs font-mono font-bold tracking-widest text-gray-500 uppercase mb-5">Products</h4>
+          <ul class="space-y-3">
+            <li><a href="controller.html" class="footer-link">AI Controller</a></li>
+            <li><a href="keyboard.html" class="footer-link">OLED Keyboard</a></li>
+            <li><a href="macro.html"    class="footer-link">Macro Deck</a></li>
+            <li><a href="coming.html"   class="footer-link">Neural Synth</a></li>
+          </ul>
+        </div>
+
+        <!-- Software 欄 -->
+        <div>
+          <h4 class="text-xs font-mono font-bold tracking-widest text-gray-500 uppercase mb-5">Software</h4>
+          <ul class="space-y-3">
+            <li><a href="software.html" class="footer-link">NEXUS Hub</a></li>
+            <li><a href="#"             class="footer-link">SDK & API</a></li>
+            <li><a href="#"             class="footer-link">Community</a></li>
+          </ul>
+        </div>
+
+        <!-- Company 欄 -->
+        <div>
+          <h4 class="text-xs font-mono font-bold tracking-widest text-gray-500 uppercase mb-5">Company</h4>
+          <ul class="space-y-3">
+            <li><a href="#" class="footer-link">About</a></li>
+            <li><a href="#" class="footer-link">Vision</a></li>
+            <li><a href="#" class="footer-link">Careers</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 底部版權列 -->
+      <div class="pt-8 border-t border-white/06 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-xs text-gray-600 font-mono">
+          © 2026 NEXUS Technologies Inc. All rights reserved.
+        </p>
+        <div class="flex items-center gap-6">
+          <a href="#" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">Privacy Policy</a>
+          <a href="#" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">Terms of Service</a>
+          <div class="flex items-center gap-1.5">
+            <div class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
+            <span class="text-xs text-gray-600 font-mono">All Systems Operational</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- =====================================================
+       JavaScript（關注點分離）
+       所有互動邏輯已移至 js/script.js
+  ====================================================== -->
+  <script src="js/script.js"></script>
+
+</body>
+</html>
