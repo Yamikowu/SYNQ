@@ -16,6 +16,7 @@
 
 html {
   scroll-behavior: smooth;   /* 平滑錨點滾動 */
+  overflow-x: hidden;
 }
 
 img,
@@ -214,8 +215,13 @@ body::before {
 }
 
 /* --- 6.7 Bento Box 格子大小類別 --- */
-.bento-large  { grid-column: span 2; grid-row: span 2; }
+.bento-large  { grid-column: span 1; grid-row: span 1; }
 .bento-medium { grid-column: span 1; }
+
+@media (min-width: 768px) {
+  .bento-large  { grid-column: span 2; grid-row: span 2; }
+  .bento-medium { grid-column: span 1; }
+}
 
 /* --- 6.8 Section 彩色分隔線 --- */
 .divider {
