@@ -113,6 +113,12 @@ body::before {
   50%       { transform: translateY(-14px); }
 }
 
+/* 跑馬燈（無限橫向捲動） */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 /* 掃描線效果（佔位區塊） */
 @keyframes scanline {
   0%   { transform: translateY(-100%); }
@@ -237,6 +243,16 @@ body::before {
 .animate-glow-pulse { animation: glow-pulse 2.5s ease-in-out infinite; }
 .animate-neon-pulse { animation: neon-pulse 2.5s ease-in-out infinite; }
 .animate-float      { animation: float     5s   ease-in-out infinite; }
+
+/* 跑馬燈工具類別 */
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
 
 /* --- 6.12 漢堡選單線條 & 動畫 --- */
 .ham-line {

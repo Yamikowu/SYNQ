@@ -249,7 +249,7 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[280px]">
 
         <!-- ── 格子 A (大): AI Smart Keyboard (跨 2 欄 × 2 列) ── -->
-        <article class="glass-card bento-large rounded-2xl p-8 flex flex-col justify-between relative overflow-hidden cursor-pointer"
+        <article class="glass-card group bento-large rounded-2xl p-8 flex flex-col justify-between relative overflow-hidden"
                  data-aos="fade-up" data-aos-delay="0">
           <!-- 背景光暈 -->
           <div class="absolute -top-12 -right-12 w-48 h-48 rounded-full pointer-events-none"
@@ -265,21 +265,17 @@
             </p>
           </div>
 
-          <!-- 產品圖片 -->
-          <div class="rounded-xl h-36 mt-4 overflow-hidden">
-            <img src="assets/img/keyboard.png" alt="AI Smart Keyboard" class="w-full h-full object-cover">
-          </div>
-
-          <!-- 右下角箭頭 -->
-          <a href="keyboard.html" class="absolute bottom-7 right-7 w-10 h-10 rounded-full border border-ice/20 flex items-center justify-center text-ice hover:bg-ice/10 transition-all hover:scale-110">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7v10"/>
-            </svg>
+          <!-- 可點擊產品圖片區塊 -->
+          <a href="keyboard.html" class="block rounded-xl flex-1 w-full min-h-[220px] mt-8 overflow-hidden relative cursor-pointer group-hover:shadow-[0_0_40px_rgba(125,211,252,0.15)] transition-shadow">
+            <img src="assets/img/keyboard.png" alt="AI Smart Keyboard" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out">
+            <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+              <span class="text-white font-mono text-sm tracking-widest flex items-center gap-2">EXPLORE <span class="text-ice">→</span></span>
+            </div>
           </a>
         </article>
 
         <!-- ── 格子 B (中): Macro Command Deck ── -->
-        <article class="glass-card bento-medium rounded-2xl p-7 flex flex-col justify-between relative overflow-hidden cursor-pointer"
+        <article class="glass-card group bento-medium rounded-2xl p-7 flex flex-col justify-between relative overflow-hidden"
                  data-aos="fade-up" data-aos-delay="150">
           <div class="absolute -bottom-8 -left-8 w-32 h-32 rounded-full pointer-events-none"
                style="background: radial-gradient(circle, rgba(168,85,247,0.12) 0%, transparent 70%);"></div>
@@ -292,30 +288,36 @@
             </p>
           </div>
 
-          <!-- 產品圖片 -->
-          <div class="rounded-xl h-28 mt-4 overflow-hidden">
-            <img src="assets/img/macro.png" alt="Macro Command Deck" class="w-full h-full object-cover">
-          </div>
+          <!-- 可點擊產品圖片區塊 -->
+          <a href="macro.html" class="block rounded-xl flex-1 w-full min-h-[140px] mt-6 overflow-hidden relative cursor-pointer group-hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] transition-shadow">
+            <img src="assets/img/macro.png" alt="Macro Command Deck" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out">
+            <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-5">
+              <span class="text-white font-mono text-xs tracking-widest flex items-center gap-2">EXPLORE <span class="text-neon">→</span></span>
+            </div>
+          </a>
         </article>
 
         <!-- ── 格子 C (中): Neural Synth ── -->
-        <article class="glass-card bento-medium rounded-2xl p-7 flex flex-col justify-between relative overflow-hidden cursor-pointer"
+        <article class="glass-card group bento-medium rounded-2xl p-7 flex flex-col justify-between relative overflow-hidden"
                  data-aos="fade-up" data-aos-delay="300">
           <div class="absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none"
                style="background: radial-gradient(circle, rgba(125,211,252,0.09) 0%, transparent 70%);"></div>
 
           <div>
-            <span class="badge bg-white/05 text-gray-500 border border-white/08 mb-3 inline-block">Coming Soon</span>
+            <span class="badge bg-white/5 text-gray-500 border border-white/10 mb-3 inline-block">Coming Soon</span>
             <h3 class="text-xl font-bold text-white mb-2">Neural Synth</h3>
             <p class="text-gray-400 text-sm leading-relaxed">
               50 點矩陣觸覺回饋合成器，以皮膚感知傳遞音樂、通知與 AI 提示。
             </p>
           </div>
 
-          <!-- 產品圖片 -->
-          <div class="rounded-xl h-28 mt-4 overflow-hidden">
-            <img src="assets/img/synth.png" alt="Neural Synth" class="w-full h-full object-cover">
-          </div>
+          <!-- 可點擊產品圖片區塊 -->
+          <a href="coming.html" class="block rounded-xl flex-1 w-full min-h-[140px] mt-6 overflow-hidden relative cursor-pointer group-hover:shadow-[0_0_30px_rgba(255,255,255,0.08)] transition-shadow">
+            <img src="assets/img/synth.png" alt="Neural Synth" class="w-full h-full object-cover opacity-80 group-hover:scale-[1.03] group-hover:opacity-100 transition-all duration-700 ease-out grayscale group-hover:grayscale-0">
+            <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-5">
+              <span class="text-white font-mono text-xs tracking-widest flex items-center gap-2">NOTIFY ME <span class="text-gray-400">→</span></span>
+            </div>
+          </a>
         </article>
 
       </div><!-- / Bento Grid -->
@@ -326,26 +328,47 @@
     <div class="divider mx-6 md:mx-20"></div>
 
     <!-- =====================================================
-         SECTION 3 — Specs (規格數字展示列)
+         SECTION 3 — Product Gallery (無縫滾動照片牆)
     ====================================================== -->
-    <section id="specs" class="py-20 px-6 max-w-7xl mx-auto">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-        <div class="glass-card rounded-xl p-6" data-aos="fade-up" data-aos-delay="0">
-          <div class="text-4xl font-black text-ice mb-1">0.3<span class="text-2xl">ms</span></div>
-          <div class="text-xs font-mono text-gray-500 tracking-widest uppercase">Trigger Latency</div>
-        </div>
-        <div class="glass-card rounded-xl p-6" data-aos="fade-up" data-aos-delay="100">
-          <div class="text-4xl font-black text-white mb-1">AI<span class="text-ice text-2xl">×4</span></div>
-          <div class="text-xs font-mono text-gray-500 tracking-widest uppercase">Onboard Cores</div>
-        </div>
-        <div class="glass-card rounded-xl p-6" data-aos="fade-up" data-aos-delay="200">
-          <div class="text-4xl font-black text-neon mb-1">36<span class="text-2xl">°C</span></div>
-          <div class="text-xs font-mono text-gray-500 tracking-widest uppercase">Thermal Control</div>
-        </div>
-        <div class="glass-card rounded-xl p-6" data-aos="fade-up" data-aos-delay="300">
-          <div class="text-4xl font-black text-white mb-1">72<span class="text-ice text-2xl">h</span></div>
-          <div class="text-xs font-mono text-gray-500 tracking-widest uppercase">Battery Life</div>
-        </div>
+    <section id="gallery" class="py-24 overflow-hidden relative">
+      <div class="text-center mb-16 px-6" data-aos="fade-up">
+        <span class="badge bg-neon/10 text-neon border border-neon/20 mb-4 inline-block">Design Gallery</span>
+        <h3 class="text-3xl font-black text-white">Focus on Details</h3>
+      </div>
+
+      <!-- 左右淡出漸層遮罩 -->
+      <div class="absolute inset-y-0 left-0 w-16 md:w-48 bg-gradient-to-r from-dark to-transparent z-10 pointer-events-none"></div>
+      <div class="absolute inset-y-0 right-0 w-16 md:w-48 bg-gradient-to-l from-dark to-transparent z-10 pointer-events-none"></div>
+
+      <!-- 無限跑馬燈容器 -->
+      <div class="flex animate-marquee gap-6 items-center hover:[animation-play-state:paused] cursor-grab active:cursor-grabbing w-max">
+        <!-- 原始群組 -->
+        <a href="controller.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
+          <img src="assets/img/controller.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
+        </a>
+        <a href="keyboard.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
+          <img src="assets/img/keyboard.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
+        </a>
+        <a href="macro.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
+          <img src="assets/img/macro.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
+        </a>
+        <a href="coming.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
+          <img src="assets/img/synth.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
+        </a>
+
+        <!-- 複製群組以做完美銜接 (完全相同) -->
+        <a href="controller.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
+          <img src="assets/img/controller.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
+        </a>
+        <a href="keyboard.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
+          <img src="assets/img/keyboard.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
+        </a>
+        <a href="macro.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
+          <img src="assets/img/macro.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
+        </a>
+        <a href="coming.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
+          <img src="assets/img/synth.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
+        </a>
       </div>
     </section>
 
@@ -536,7 +559,6 @@
             <li><a href="controller.html" class="footer-link">AI Controller</a></li>
             <li><a href="keyboard.html" class="footer-link">OLED Keyboard</a></li>
             <li><a href="macro.html"    class="footer-link">Macro Deck</a></li>
-            <li><a href="coming.html"   class="footer-link">Neural Synth</a></li>
           </ul>
         </div>
 
