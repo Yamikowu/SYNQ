@@ -92,7 +92,104 @@ window.addEventListener('scroll', updateScrollBar, { passive: true });
 
 
 /* =======================================================
-   5. Waitlist 表單模擬提交
+   5. Hero Controller 跟隨滑鼠傾斜
+   僅在可 hover 裝置啟用；滑出後自動回正
+======================================================= */
+const heroControllerLink = document.querySelector('.hero-controller-link');
+
+function initHeroControllerTilt() {
+  if (!heroControllerLink) return;
+  if (!window.matchMedia('(hover: hover)').matches) return;
+
+  const maxTilt = 8;
+  let frameRequested = false;
+  let targetX = 0;
+  let targetY = 0;
+
+  function renderTilt() {
+    frameRequested = false;
+    heroControllerLink.style.setProperty('--tilt-x', `${targetX.toFixed(2)}deg`);
+    heroControllerLink.style.setProperty('--tilt-y', `${targetY.toFixed(2)}deg`);
+  }
+
+  function scheduleRender() {
+    if (frameRequested) return;
+    frameRequested = true;
+    window.requestAnimationFrame(renderTilt);
+  }
+
+  heroControllerLink.addEventListener('mousemove', (event) => {
+    const rect = heroControllerLink.getBoundingClientRect();
+    const xRatio = (event.clientX - rect.left) / rect.width;
+    const yRatio = (event.clientY - rect.top) / rect.height;
+
+    targetY = (xRatio - 0.5) * (maxTilt * 2);
+    targetX = (0.5 - yRatio) * (maxTilt * 2);
+    scheduleRender();
+  });
+
+  heroControllerLink.addEventListener('mouseleave', () => {
+    targetX = 0;
+    targetY = 0;
+    scheduleRender();
+  });
+}
+
+initHeroControllerTilt();
+
+
+/* =======================================================
+   6. Gallery 卡片跟隨滑鼠傾斜
+   套用在 #gallery 的所有產品卡片
+======================================================= */
+const galleryCards = document.querySelectorAll('#gallery a.glass-card');
+
+function initGalleryCardTilt() {
+  if (!galleryCards.length) return;
+  if (!window.matchMedia('(hover: hover)').matches) return;
+
+  const maxTilt = 6;
+
+  galleryCards.forEach((card) => {
+    let frameRequested = false;
+    let targetX = 0;
+    let targetY = 0;
+
+    function renderTilt() {
+      frameRequested = false;
+      card.style.setProperty('--g-tilt-x', `${targetX.toFixed(2)}deg`);
+      card.style.setProperty('--g-tilt-y', `${targetY.toFixed(2)}deg`);
+    }
+
+    function scheduleRender() {
+      if (frameRequested) return;
+      frameRequested = true;
+      window.requestAnimationFrame(renderTilt);
+    }
+
+    card.addEventListener('mousemove', (event) => {
+      const rect = card.getBoundingClientRect();
+      const xRatio = (event.clientX - rect.left) / rect.width;
+      const yRatio = (event.clientY - rect.top) / rect.height;
+
+      targetY = (xRatio - 0.5) * (maxTilt * 2);
+      targetX = (0.5 - yRatio) * (maxTilt * 2);
+      scheduleRender();
+    });
+
+    card.addEventListener('mouseleave', () => {
+      targetX = 0;
+      targetY = 0;
+      scheduleRender();
+    });
+  });
+}
+
+initGalleryCardTilt();
+
+
+/* =======================================================
+   7. Waitlist 表單模擬提交
    實際部署時，可將此函式替換為 fetch() 呼叫後端 API
 ======================================================= */
 

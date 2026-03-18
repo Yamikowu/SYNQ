@@ -245,6 +245,68 @@ body::before {
               0 0 20px rgba(125, 211, 252, 0.08);
 }
 
+/* --- 6.10.1 Hero Controller 互動卡片 --- */
+.hero-controller-link {
+  position: relative;
+  isolation: isolate;
+  transform-style: preserve-3d;
+  transform: perspective(1100px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform 0.18s ease-out, box-shadow 0.45s var(--ease-smooth), filter 0.45s var(--ease-smooth);
+  will-change: transform;
+}
+
+.hero-controller-link::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(120deg, transparent 15%, rgba(125, 211, 252, 0.32) 45%, rgba(168, 85, 247, 0.28) 55%, transparent 85%);
+  transform: translateX(-120%);
+  transition: transform 0.8s var(--ease-smooth);
+}
+
+.hero-controller-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(125, 211, 252, 0.14), transparent 65%);
+  opacity: 0;
+  transition: opacity 0.45s var(--ease-smooth);
+}
+
+.hero-controller-image {
+  transition: transform 0.7s var(--ease-smooth), filter 0.55s var(--ease-smooth);
+  transform-origin: center;
+}
+
+@media (hover: hover) {
+  .hero-controller-link:hover {
+    box-shadow: 0 24px 46px rgba(0, 0, 0, 0.62), 0 0 36px rgba(125, 211, 252, 0.26), 0 0 60px rgba(168, 85, 247, 0.18);
+    filter: saturate(1.08);
+  }
+
+  .hero-controller-link:hover::before {
+    transform: translateX(120%);
+  }
+
+  .hero-controller-link:hover::after {
+    opacity: 1;
+  }
+
+  .hero-controller-link:hover .hero-controller-image {
+    transform: scale(1.05);
+    filter: contrast(1.05) brightness(1.07);
+  }
+}
+
+.hero-controller-link:focus-visible {
+  outline: 2px solid rgba(125, 211, 252, 0.9);
+  outline-offset: 3px;
+}
+
 /* --- 6.11 動畫工具類別 --- */
 .animate-glow-pulse { animation: glow-pulse 2.5s ease-in-out infinite; }
 .animate-neon-pulse { animation: neon-pulse 2.5s ease-in-out infinite; }
@@ -258,6 +320,64 @@ body::before {
 }
 .animate-marquee:hover {
   animation-play-state: paused;
+}
+
+/* --- 6.11.1 Gallery 卡片掃光 + 發光 --- */
+#gallery a.glass-card {
+  position: relative;
+  isolation: isolate;
+  transform-style: preserve-3d;
+  transform: perspective(1000px) rotateX(var(--g-tilt-x, 0deg)) rotateY(var(--g-tilt-y, 0deg));
+  transition: transform 0.16s ease-out, box-shadow 0.35s var(--ease-smooth), border-color 0.35s var(--ease-smooth);
+  will-change: transform;
+}
+
+#gallery a.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    120deg,
+    transparent 18%,
+    rgba(125, 211, 252, 0.34) 46%,
+    rgba(168, 85, 247, 0.22) 56%,
+    transparent 84%
+  );
+  transform: translateX(-125%);
+  transition: none;
+}
+
+#gallery a.glass-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(125, 211, 252, 0.16), transparent 68%);
+  opacity: 0;
+  transition: opacity 0.35s var(--ease-smooth);
+}
+
+@media (hover: hover) {
+  #gallery a.glass-card:hover {
+    border-color: rgba(125, 211, 252, 0.38);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.5), 0 0 24px rgba(125, 211, 252, 0.26), 0 0 44px rgba(168, 85, 247, 0.16);
+  }
+
+  #gallery a.glass-card:hover img {
+    transform: scale(1.06);
+  }
+
+  #gallery a.glass-card:hover::before {
+    transition: transform 0.75s var(--ease-smooth);
+    transform: translateX(125%);
+  }
+
+  #gallery a.glass-card:hover::after {
+    opacity: 1;
+  }
 }
 
 /* --- 6.12 漢堡選單線條 & 動畫 --- */
