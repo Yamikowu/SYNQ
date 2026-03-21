@@ -46,6 +46,9 @@
       box-shadow: 0 16px 30px rgba(0, 0, 0, 0.35), 0 0 20px rgba(125, 211, 252, 0.12);
       opacity: 0.86;
       will-change: transform, opacity;
+      contain: layout paint style;
+      backface-visibility: hidden;
+      transform: translate3d(0, 0, 0);
     }
 
     .hero-rain-drop img {
@@ -445,31 +448,35 @@
   <script src="js/layout.js"></script>
   <script>
     (function initHeroRain() {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
       const stage = document.getElementById('hero-rain-stage');
+      const heroSection = document.getElementById('hero');
       if (!stage) return;
+      if (!heroSection) return;
 
       const sources = [
-        'assets/img/controller/front.png',
-        'assets/img/controller/back.png',
-        'assets/img/controller/gears.png',
-        'assets/img/keyboard/keyboard.png',
-        'assets/img/macro/macro.png',
-        'assets/img/macro/croma.png',
-        'assets/img/macro/gears.png',
-        'assets/img/synth.png',
-        'assets/img/software/controller.png',
-        'assets/img/software/macro.png',
+        'assets/img/rain/controller-front.jpg',
+        'assets/img/rain/controller-back.jpg',
+        'assets/img/rain/controller-gears.jpg',
+        'assets/img/rain/keyboard-main.jpg',
+        'assets/img/rain/macro-main.jpg',
+        'assets/img/rain/macro-croma.jpg',
+        'assets/img/rain/macro-gears.jpg',
+        'assets/img/rain/synth-main.jpg',
+        'assets/img/rain/software-controller.jpg',
+        'assets/img/rain/software-macro.jpg',
       ];
 
       const links = {
-        'assets/img/controller/front.png': 'controller.html',
-        'assets/img/controller/back.png': 'controller.html',
-        'assets/img/controller/gears.png': 'controller.html',
-        'assets/img/keyboard/keyboard.png': 'coming.html',
-        'assets/img/macro/macro.png': 'macro.html',
-        'assets/img/macro/croma.png': 'macro.html',
-        'assets/img/macro/gears.png': 'macro.html',
-        'assets/img/synth.png': '#waitlist',
+        'assets/img/rain/controller-front.jpg': 'controller.html',
+        'assets/img/rain/controller-back.jpg': 'controller.html',
+        'assets/img/rain/controller-gears.jpg': 'controller.html',
+        'assets/img/rain/keyboard-main.jpg': 'coming.html',
+        'assets/img/rain/macro-main.jpg': 'macro.html',
+        'assets/img/rain/macro-croma.jpg': 'macro.html',
+        'assets/img/rain/macro-gears.jpg': 'macro.html',
+        'assets/img/rain/synth-main.jpg': '#waitlist',
       };
 
       let stageW = 0;
@@ -479,9 +486,14 @@
       const drops = [];
       const lanes = [];
       let laneCount = 0;
+      let maxDrops = 0;
       let pool = [];
       let poolIndex = 0;
       let nowSec = 0;
+      let isRunning = false;
+      let isHeroVisible = false;
+      const fpsInterval = 1000 / 45;
+      let lastPaintTs = 0;
 
       function shuffle(list) {
         const arr = list.slice();
@@ -502,6 +514,18 @@
         return src;
       }
 
+      function warmupImages() {
+        for (const src of sources) {
+          const img = new Image();
+          img.decoding = 'async';
+          img.loading = 'eager';
+          img.src = src;
+          if (typeof img.decode === 'function') {
+            img.decode().catch(() => {});
+          }
+        }
+      }
+
       function setStageSize() {
         const rect = stage.getBoundingClientRect();
         stageW = rect.width;
@@ -515,7 +539,8 @@
         link.setAttribute('aria-hidden', 'true');
 
         const img = document.createElement('img');
-        img.loading = 'lazy';
+        img.loading = 'eager';
+        img.decoding = 'async';
         link.appendChild(img);
         stage.appendChild(link);
 
@@ -549,6 +574,7 @@
 
       function configureLanes() {
         laneCount = window.innerWidth < 640 ? 3 : window.innerWidth < 1024 ? 4 : 5;
+        maxDrops = laneCount * 4;
         const laneWidth = stageW / laneCount;
         lanes.length = 0;
 
@@ -563,12 +589,18 @@
 
       function frame(ts) {
         if (!lastTs) lastTs = ts;
+        if (lastPaintTs && ts - lastPaintTs < fpsInterval) {
+          rafId = window.requestAnimationFrame(frame);
+          return;
+        }
+
         const dt = Math.min(0.033, (ts - lastTs) / 1000);
         lastTs = ts;
+        lastPaintTs = ts;
         nowSec = ts / 1000;
 
         for (const lane of lanes) {
-          if (nowSec >= lane.nextSpawnAt) {
+          if (nowSec >= lane.nextSpawnAt && drops.length < maxDrops) {
             spawnForLane(lane, false);
             lane.nextSpawnAt = nowSec + 1.35 + Math.random() * 1.15;
           }
@@ -591,6 +623,23 @@
         rafId = window.requestAnimationFrame(frame);
       }
 
+      function startAnimation() {
+        if (isRunning) return;
+        isRunning = true;
+        lastTs = 0;
+        lastPaintTs = 0;
+        rafId = window.requestAnimationFrame(frame);
+      }
+
+      function stopAnimation() {
+        if (!isRunning) return;
+        isRunning = false;
+        if (rafId) {
+          window.cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+      }
+
       function resetDrops() {
         setStageSize();
         nowSec = performance.now() / 1000;
@@ -602,23 +651,46 @@
         }
       }
 
+      warmupImages();
       resetDrops();
-      rafId = window.requestAnimationFrame(frame);
+      startAnimation();
 
       let resizeTimer = null;
       window.addEventListener('resize', () => {
         window.clearTimeout(resizeTimer);
-        resizeTimer = window.setTimeout(resetDrops, 140);
+        resizeTimer = window.setTimeout(() => {
+          resetDrops();
+          if (isHeroVisible && !document.hidden) startAnimation();
+        }, 140);
       });
 
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden && rafId) {
-          window.cancelAnimationFrame(rafId);
-          rafId = null;
-        } else if (!document.hidden && !rafId) {
-          lastTs = 0;
-          rafId = window.requestAnimationFrame(frame);
+        if (document.hidden) {
+          stopAnimation();
+        } else if (isHeroVisible) {
+          startAnimation();
         }
+      });
+
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.target !== heroSection) continue;
+            isHeroVisible = entry.isIntersecting && entry.intersectionRatio > 0.15;
+            if (isHeroVisible && !document.hidden) {
+              startAnimation();
+            } else {
+              stopAnimation();
+            }
+          }
+        },
+        { threshold: [0, 0.15, 0.35] }
+      );
+      io.observe(heroSection);
+
+      window.addEventListener('beforeunload', () => {
+        io.disconnect();
+        stopAnimation();
       });
     })();
   </script>
