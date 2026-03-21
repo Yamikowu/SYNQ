@@ -4,6 +4,7 @@
    技術：純手工 CSS，搭配 Tailwind CDN 補足原子類
    架構原則：關注點分離 (Separation of Concerns)
 ======================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 /* ── 1. CSS Reset 全局重置 ─────────────────────────── */
 *,
@@ -38,19 +39,19 @@ ol {
 /* ── 2. 設計系統全局變數 (:root) ──────────────────── */
 :root {
   /* --- 主題色票 --- */
-  --color-bg:        #0a0a0a;   /* 最深背景 */
-  --color-bg-2:      #111111;   /* 次層背景 */
-  --color-bg-3:      #1a1a1a;   /* 卡片底色 */
-  --color-ice:       #7dd3fc;   /* 冰藍點綴色 */
+  --color-bg:        #070b14;   /* 最深背景 */
+  --color-bg-2:      #0e1628;   /* 次層背景 */
+  --color-bg-3:      #152238;   /* 卡片底色 */
+  --color-ice:       #5ee6ff;   /* 電藍點綴色 */
   --color-neon:      #a855f7;   /* 霓虹紫點綴色 */
   --color-neon-deep: #9333ea;   /* 深紫（按鈕漸層終點） */
-  --color-text:      #e5e7eb;   /* 主要文字 */
-  --color-text-muted:#6b7280;   /* 次要文字 */
+  --color-text:      #e8eef9;   /* 主要文字 */
+  --color-text-muted:#8da1bb;   /* 次要文字 */
 
   /* --- 毛玻璃參數 --- */
-  --glass-bg:        rgba(255, 255, 255, 0.035);
-  --glass-border:    rgba(255, 255, 255, 0.08);
-  --glass-blur:      blur(12px);
+  --glass-bg:        rgba(21, 34, 56, 0.48);
+  --glass-border:    rgba(94, 230, 255, 0.16);
+  --glass-blur:      blur(14px);
 
   /* --- 間距 Scale --- */
   --space-xs:  0.25rem;   /*  4px */
@@ -60,8 +61,8 @@ ol {
   --space-xl:  4rem;      /* 64px */
 
   /* --- 字型 --- */
-  --font-sans: 'Inter',          ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-sans: 'Space Grotesk',  ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Chakra Petch',   ui-monospace, monospace;
 
   /* --- 圓角 --- */
   --radius-sm:  6px;
@@ -75,7 +76,10 @@ ol {
 
 /* ── 3. 全局基底樣式 ───────────────────────────────── */
 body {
-  background-color: var(--color-bg);
+  background:
+    radial-gradient(1200px 600px at 85% -5%, rgba(168, 85, 247, 0.09), transparent 55%),
+    radial-gradient(900px 520px at 10% 8%, rgba(94, 230, 255, 0.12), transparent 55%),
+    linear-gradient(180deg, #060910 0%, #0a1020 45%, #070b14 100%);
   color: var(--color-text);
   font-family: var(--font-sans);
   overflow-x: hidden;
@@ -91,7 +95,18 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.45;
+  opacity: 0.28;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    linear-gradient(110deg, rgba(94, 230, 255, 0.04), transparent 38%),
+    linear-gradient(290deg, rgba(168, 85, 247, 0.04), transparent 42%);
 }
 
 /* ── 5. 全局 Keyframe 動畫 ─────────────────────────── */
@@ -130,59 +145,66 @@ body::before {
 
 /* --- 6.1 毛玻璃 Navbar --- */
 .glass-nav {
-  background: rgba(10, 10, 10, 0.72);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(7, 11, 20, 0.72);
+  backdrop-filter: blur(22px) saturate(155%);
+  -webkit-backdrop-filter: blur(22px) saturate(155%);
+  border-bottom: 1px solid rgba(94, 230, 255, 0.12);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
 }
 
 /* --- 6.2 毛玻璃卡片 --- */
 .glass-card {
-  background: var(--glass-bg);
+  background:
+    linear-gradient(165deg, rgba(94, 230, 255, 0.06), transparent 40%),
+    linear-gradient(340deg, rgba(168, 85, 247, 0.06), transparent 48%),
+    var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
-  transition: all 0.4s var(--ease-smooth);
+  transition: transform 0.35s var(--ease-smooth), border-color 0.35s var(--ease-smooth), box-shadow 0.35s var(--ease-smooth);
 }
 
 .glass-card:hover {
-  background: rgba(125, 211, 252, 0.07);
-  border-color: rgba(125, 211, 252, 0.25);
-  transform: translateY(-8px);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6),
-              0 0 30px rgba(125, 211, 252, 0.12);
+  border-color: rgba(94, 230, 255, 0.42);
+  transform: translateY(-6px);
+  box-shadow: 0 22px 38px rgba(0, 0, 0, 0.48),
+              0 0 28px rgba(94, 230, 255, 0.16),
+              inset 0 0 0 1px rgba(168, 85, 247, 0.24);
 }
 
 /* --- 6.3 Waitlist 霓虹紫發光按鈕 --- */
 .btn-waitlist {
-  background: linear-gradient(135deg, var(--color-neon), var(--color-neon-deep));
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.4),
-              0 0 28px rgba(168, 85, 247, 0.2);
+  background: linear-gradient(130deg, var(--color-neon), var(--color-neon-deep) 58%, #6b21a8);
+  border: 1px solid rgba(192, 132, 252, 0.45);
+  box-shadow: 0 10px 24px rgba(147, 51, 234, 0.35), 0 0 0 1px rgba(168, 85, 247, 0.2) inset;
   transition: all 0.3s ease;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .btn-waitlist:hover {
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.7),
-              0 0 50px rgba(168, 85, 247, 0.35);
-  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 16px 30px rgba(147, 51, 234, 0.5), 0 0 32px rgba(168, 85, 247, 0.38);
+  transform: translateY(-2px) scale(1.02);
 }
 
 /* --- 6.4 Hero 漸層背景 --- */
 .hero-bg {
   background:
-    radial-gradient(ellipse 70% 60% at 50% 30%, rgba(125, 211, 252, 0.07) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 50% at 80% 70%, rgba(168,  85, 247, 0.06) 0%, transparent 60%),
+    conic-gradient(from 210deg at 50% 42%, rgba(94, 230, 255, 0.1), transparent 40%, rgba(168, 85, 247, 0.08) 72%, transparent 90%),
+    radial-gradient(ellipse 80% 62% at 50% 26%, rgba(94, 230, 255, 0.08) 0%, transparent 68%),
+    radial-gradient(ellipse 46% 52% at 82% 70%, rgba(168, 85, 247, 0.08) 0%, transparent 62%),
     var(--color-bg);
 }
 
 /* --- 6.5 Hero 大標題文字漸層 --- */
 .hero-title {
-  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 40%, var(--color-ice) 80%);
+  background: linear-gradient(110deg, #f8fbff 0%, #a7d6ff 34%, var(--color-ice) 58%, #d8b4fe 86%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 24px rgba(94, 230, 255, 0.12);
 }
 
 /* --- 6.6 圖片佔位區塊 --- */
@@ -229,8 +251,8 @@ body::before {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(125, 211, 252, 0.3),
-    rgba(168,  85, 247, 0.2),
+    rgba(94, 230, 255, 0.45),
+    rgba(168, 85, 247, 0.35),
     transparent
   );
 }
@@ -241,8 +263,9 @@ body::before {
 
 /* --- 6.10 冰藍邊框發光效果 --- */
 .ice-glow {
-  box-shadow: 0 0 0 1px rgba(125, 211, 252, 0.2),
-              0 0 20px rgba(125, 211, 252, 0.08);
+  box-shadow: 0 0 0 1px rgba(94, 230, 255, 0.3),
+              0 0 20px rgba(94, 230, 255, 0.14),
+              0 0 42px rgba(168, 85, 247, 0.12);
 }
 
 /* --- 6.10.1 Hero Controller 互動卡片 --- */
@@ -406,23 +429,27 @@ body::before {
 
 /* --- 6.14 標籤 Badge --- */
 .badge {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-family: var(--font-mono);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
+  font-weight: 600;
   text-transform: uppercase;
-  padding: 3px 10px;
-  border-radius: 2px;
+  padding: 4px 12px;
+  border-radius: 999px;
   display: inline-block;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 /* --- 6.15 Software Hub 預覽圖 --- */
 .software-preview {
   background: linear-gradient(
     135deg,
-    rgba(125, 211, 252, 0.04),
-    rgba(10, 10, 10, 0.8)
+    rgba(94, 230, 255, 0.07),
+    rgba(7, 11, 20, 0.86) 55%,
+    rgba(168, 85, 247, 0.05)
   );
-  border: 1px solid rgba(125, 211, 252, 0.12);
+  border: 1px solid rgba(94, 230, 255, 0.2);
   position: relative;
   overflow: hidden;
 }
@@ -477,7 +504,7 @@ body::before {
   position: fixed;
   top: 0;
   left: 0;
-  height: 2px;
+  height: 3px;
   background: linear-gradient(90deg, var(--color-ice), var(--color-neon));
   z-index: 10000;
   transition: width 0.1s linear;
