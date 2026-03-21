@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SYNQ Hub — Online Driver Preview</title>
+  <meta name="description" content="SYNQ Hub 線上驅動預覽，可調整 Macro 按鍵映射、旋鈕模式與 Controller 宏功能。" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-shared.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    .action-btn.active,
+    .knob-mode-btn.active,
+    .knob-rotate-btn.active,
+    .macro-profile-btn.active,
+    .macro-preset-btn.active {
+      border-color: rgba(94, 230, 255, 0.45);
+      background: rgba(94, 230, 255, 0.12);
+      color: #dff8ff;
+      box-shadow: 0 0 20px rgba(94, 230, 255, 0.14);
+    }
+
+    .macro-console {
+      background:
+        linear-gradient(165deg, rgba(94, 230, 255, 0.08), transparent 34%),
+        linear-gradient(340deg, rgba(168, 85, 247, 0.08), transparent 52%),
+        rgba(10, 17, 31, 0.72);
+      border: 1px solid rgba(94, 230, 255, 0.2);
+    }
+
+    .key-cell {
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(9, 15, 26, 0.9) 42%),
+        rgba(11, 18, 34, 0.9);
+      min-height: 78px;
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .key-cell:hover {
+      transform: translateY(-2px);
+      border-color: rgba(94, 230, 255, 0.36);
+    }
+
+    .key-cell.active {
+      border-color: rgba(94, 230, 255, 0.58);
+      box-shadow: 0 0 20px rgba(94, 230, 255, 0.2);
+    }
+
+    .key-label {
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 10px;
+      color: #9ab2c8;
+      font-family: var(--font-mono);
+    }
+
+    .key-value {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f0f6ff;
+      line-height: 1.15;
+    }
+
+    .knob-ring {
+      width: 180px;
+      height: 180px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background:
+        conic-gradient(from -90deg, rgba(94, 230, 255, 0.82) var(--knob-progress, 42%), rgba(255, 255, 255, 0.1) 0),
+        radial-gradient(circle at 50% 50%, rgba(12, 20, 34, 1) 58%, rgba(94, 230, 255, 0.08) 100%);
+      display: grid;
+      place-items: center;
+      margin: 0 auto;
+    }
+
+    .knob-core {
+      width: 112px;
+      height: 112px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(9, 15, 28, 0.82));
+      box-shadow: inset 0 8px 18px rgba(255, 255, 255, 0.06), inset 0 -10px 14px rgba(0, 0, 0, 0.38);
+      display: grid;
+      place-items: center;
+    }
+
+    .step-chip {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+    }
+  </style>
+</head>
+
+<body class="antialiased font-sans">
+  <div id="scroll-bar"></div>
+  <div id="layout-navbar"></div>
+
+  <main>
+    <section class="hero-bg pt-24 pb-12 px-6 relative overflow-hidden">
+      <div class="max-w-7xl mx-auto relative z-10 text-center" data-aos="fade-up">
+        <span class="badge bg-ice/10 text-ice border border-ice/20 mb-5 inline-block">SYNQ Hub Preview</span>
+        <h1 class="hero-title text-4xl md:text-6xl font-black text-white mb-4">線上驅動控制台</h1>
+        <p class="text-gray-300 text-base md:text-lg leading-relaxed max-w-3xl mx-auto">
+          可即時預覽 Macro Deck 與 AI Controller 的設定流程，先調參數再決定最終配置。
+        </p>
+      </div>
+    </section>
+
+    <div class="divider mx-6 md:mx-20"></div>
+
+    <section id="macro-settings" class="py-16 px-6 max-w-7xl mx-auto">
+      <div class="text-center mb-10" data-aos="fade-up">
+        <span class="badge bg-ice/10 text-ice border border-ice/20 mb-4 inline-block">Macro Deck Settings</span>
+        <h2 class="text-3xl md:text-4xl font-black text-white">Macro 映射與旋鈕設定</h2>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-[1.25fr_0.75fr] gap-8 xl:items-stretch">
+        <article class="macro-console rounded-2xl p-6 md:p-7" data-aos="fade-up">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+            <div>
+              <p class="text-xs font-mono tracking-widest text-ice mb-2">MAPPING CONSOLE</p>
+              <h3 class="text-2xl md:text-3xl font-black text-white">16 鍵 OLED 映射面板</h3>
+            </div>
+            <p class="text-xs text-gray-400">選功能後點按鍵，即時套用</p>
+          </div>
+
+          <div id="macro-preset-group" class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-5">
+            <button class="macro-preset-btn active border border-white/12 rounded-lg px-3 py-2 text-xs text-gray-300 transition-colors" data-preset="editing">Editing</button>
+            <button class="macro-preset-btn border border-white/12 rounded-lg px-3 py-2 text-xs text-gray-300 transition-colors" data-preset="stream">Streaming</button>
+            <button class="macro-preset-btn border border-white/12 rounded-lg px-3 py-2 text-xs text-gray-300 transition-colors" data-preset="music">Music</button>
+          </div>
+
+          <div id="action-palette" class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
+            <button class="action-btn active border border-white/12 rounded-lg px-3 py-2 text-xs text-gray-300 transition-colors" data-action="Cut">Cut</button>
+            <button class="action-btn border border-white/12 rounded-lg px-3 py-2 text-xs text-gray-300 transition-colors" data-action="Ripple">Ripple</button>
+            <button class="action-btn border border-white/12 rounded-lg px-3 py-2 text-xs text-gray-300 transition-colors" data-action="Marker">Marker</button>
+            <button class="action-btn border border-white/12 rounded-lg px-3 py-2 text-xs text-gray-300 transition-colors" data-action="Render">Render</button>
+            <button class="action-btn border border-white/12 rounded-lg px-3 py-2 text-xs text-gray-300 transition-colors" data-action="Mute">Mute</button>
+            <button class="action-btn border border-white/12 rounded-lg px-3 py-2 text-xs text-gray-300 transition-colors" data-action="Solo">Solo</button>
+            <button class="action-btn border border-white/12 rounded-lg px-3 py-2 text-xs text-gray-300 transition-colors" data-action="Undo">Undo</button>
+            <button class="action-btn border border-white/12 rounded-lg px-3 py-2 text-xs text-gray-300 transition-colors" data-action="Save">Save</button>
+          </div>
+
+          <div id="key-grid" class="grid grid-cols-4 gap-2 md:gap-3">
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K1"><span class="key-label block mb-1">K1</span><span class="key-value">Cut</span></button>
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K2"><span class="key-label block mb-1">K2</span><span class="key-value">Ripple</span></button>
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K3"><span class="key-label block mb-1">K3</span><span class="key-value">Marker</span></button>
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K4"><span class="key-label block mb-1">K4</span><span class="key-value">Render</span></button>
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K5"><span class="key-label block mb-1">K5</span><span class="key-value">Mute</span></button>
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K6"><span class="key-label block mb-1">K6</span><span class="key-value">Solo</span></button>
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K7"><span class="key-label block mb-1">K7</span><span class="key-value">Undo</span></button>
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K8"><span class="key-label block mb-1">K8</span><span class="key-value">Save</span></button>
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K9"><span class="key-label block mb-1">K9</span><span class="key-value">Track +</span></button>
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K10"><span class="key-label block mb-1">K10</span><span class="key-value">Track -</span></button>
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K11"><span class="key-label block mb-1">K11</span><span class="key-value">Layer A</span></button>
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K12"><span class="key-label block mb-1">K12</span><span class="key-value">Layer B</span></button>
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K13"><span class="key-label block mb-1">K13</span><span class="key-value">Scene 1</span></button>
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K14"><span class="key-label block mb-1">K14</span><span class="key-value">Scene 2</span></button>
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K15"><span class="key-label block mb-1">K15</span><span class="key-value">Preview</span></button>
+            <button class="key-cell rounded-lg p-3 text-left" data-key="K16"><span class="key-label block mb-1">K16</span><span class="key-value">Publish</span></button>
+          </div>
+
+          <p id="mapping-log" class="mt-5 text-sm text-ice/90">目前選擇功能：Cut</p>
+        </article>
+
+        <article class="glass-card rounded-2xl p-6 md:p-7 h-full" data-aos="fade-up" data-aos-delay="120">
+          <div class="mb-6">
+            <p class="text-xs font-mono tracking-widest text-neon mb-2">KNOB MODULE</p>
+            <h3 class="text-2xl md:text-3xl font-black text-white">旋鈕功能切換</h3>
+          </div>
+
+          <div id="knob-mode-group" class="grid grid-cols-2 gap-2 mb-6">
+            <button class="knob-mode-btn active border border-white/12 rounded-lg py-2 px-3 text-xs text-gray-300 transition-colors" data-mode="Timeline">Timeline</button>
+            <button class="knob-mode-btn border border-white/12 rounded-lg py-2 px-3 text-xs text-gray-300 transition-colors" data-mode="Brush">Brush</button>
+            <button class="knob-mode-btn border border-white/12 rounded-lg py-2 px-3 text-xs text-gray-300 transition-colors" data-mode="Volume">Volume</button>
+            <button class="knob-mode-btn border border-white/12 rounded-lg py-2 px-3 text-xs text-gray-300 transition-colors" data-mode="Zoom">Zoom</button>
+          </div>
+
+          <div class="knob-ring mb-5" id="knob-ring" style="--knob-progress: 42%;">
+            <div class="knob-core">
+              <div class="text-center">
+                <p id="knob-value" class="text-2xl font-black text-white">42</p>
+                <p id="knob-mode" class="text-[10px] font-mono tracking-widest text-gray-400 mt-1">TIMELINE</p>
+              </div>
+            </div>
+          </div>
+
+          <input id="knob-slider" type="range" min="0" max="100" value="42" class="w-full accent-cyan-300" />
+          <p id="knob-log" class="mt-4 text-sm text-neon/90">模式：Timeline，輸出值：42</p>
+
+          <div class="mt-4 pt-4 border-t border-white/10">
+            <p class="text-xs font-mono tracking-widest text-gray-400 mb-2">ROTATION MAPPING</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+              <label class="border border-white/12 rounded-lg px-3 py-2 bg-white/5">
+                <span class="block text-[10px] font-mono text-gray-400 tracking-widest mb-1">右旋 (CW)</span>
+                <select id="knob-cw-fn" class="w-full bg-transparent text-sm text-white focus:outline-none">
+                  <option value="Next Frame">Next Frame</option>
+                  <option value="Timeline +5">Timeline +5</option>
+                  <option value="Volume +2dB">Volume +2dB</option>
+                  <option value="Brush +">Brush +</option>
+                  <option value="Zoom In">Zoom In</option>
+                </select>
+              </label>
+              <label class="border border-white/12 rounded-lg px-3 py-2 bg-white/5">
+                <span class="block text-[10px] font-mono text-gray-400 tracking-widest mb-1">左旋 (CCW)</span>
+                <select id="knob-ccw-fn" class="w-full bg-transparent text-sm text-white focus:outline-none">
+                  <option value="Prev Frame">Prev Frame</option>
+                  <option value="Timeline -5">Timeline -5</option>
+                  <option value="Volume -2dB">Volume -2dB</option>
+                  <option value="Brush -">Brush -</option>
+                  <option value="Zoom Out">Zoom Out</option>
+                </select>
+              </label>
+            </div>
+            <p class="mt-1 text-xs text-gray-400">可為左右旋設定個別功能。</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <div class="divider mx-6 md:mx-20"></div>
+
+    <section id="controller-settings" class="py-16 px-6 max-w-7xl mx-auto">
+      <div class="text-center mb-10" data-aos="fade-up">
+        <span class="badge bg-neon/10 text-neon border border-neon/20 mb-4 inline-block">Controller Settings</span>
+        <h2 class="text-3xl md:text-4xl font-black text-white">Controller 宏功能設定</h2>
+      </div>
+
+      <article class="glass-card rounded-2xl p-6 md:p-8" data-aos="fade-up">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-7">
+          <div>
+            <p class="text-xs font-mono tracking-widest text-ice mb-2">AI CONTROLLER</p>
+            <h3 class="text-2xl md:text-3xl font-black text-white">宏功能流程編排</h3>
+          </div>
+          <button id="run-macro" class="btn-waitlist px-5 py-2.5 rounded-lg text-xs font-bold text-white">Run Macro Simulation</button>
+        </div>
+
+        <div id="macro-profile-group" class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-6">
+          <button class="macro-profile-btn active border border-white/12 rounded-lg px-4 py-2 text-sm text-gray-300 transition-colors" data-profile="fps">FPS 競技</button>
+          <button class="macro-profile-btn border border-white/12 rounded-lg px-4 py-2 text-sm text-gray-300 transition-colors" data-profile="moba">MOBA 連招</button>
+          <button class="macro-profile-btn border border-white/12 rounded-lg px-4 py-2 text-sm text-gray-300 transition-colors" data-profile="creator">Creator 快捷</button>
+        </div>
+
+        <div id="macro-steps" class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4"></div>
+        <p id="macro-log" class="text-sm text-gray-300">目前配置：FPS 競技，按下模擬可查看觸發順序。</p>
+      </article>
+    </section>
+
+    <div class="divider mx-6 md:mx-20"></div>
+
+    <section id="hub-download" class="py-20 px-6">
+      <div class="max-w-4xl mx-auto text-center" data-aos="fade-up">
+        <p class="text-ice text-sm font-mono tracking-widest mb-3">HUB INSTALLER</p>
+        <h2 class="text-3xl md:text-4xl font-black text-white mb-4">下載 SYNQ Hub</h2>
+        <p class="text-gray-400 text-base md:text-lg mb-8 leading-relaxed">完整版本將支援裝置連接、雲端同步與多配置管理。先選擇你的平台：</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
+          <a href="#" class="btn-waitlist rounded-xl px-5 py-4 text-sm font-bold text-white">macOS Download</a>
+          <a href="#" class="btn-waitlist rounded-xl px-5 py-4 text-sm font-bold text-white">Windows Download</a>
+          <a href="#" class="btn-waitlist rounded-xl px-5 py-4 text-sm font-bold text-white">Linux Download</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="layout-footer"></div>
+
+  <script src="js/script.js"></script>
+  <script src="js/layout-templates.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    (function initSoftwarePreview() {
+      const actionButtons = Array.from(document.querySelectorAll('.action-btn'));
+      const keyCells = Array.from(document.querySelectorAll('.key-cell'));
+      const mappingLog = document.getElementById('mapping-log');
+      let selectedAction = 'Cut';
+
+      const presetMaps = {
+        editing: ['Cut', 'Ripple', 'Marker', 'Render', 'Mute', 'Solo', 'Undo', 'Save', 'Track +', 'Track -', 'Layer A', 'Layer B', 'Scene 1', 'Scene 2', 'Preview', 'Publish'],
+        stream: ['Scene A', 'Scene B', 'Ad Break', 'Replay', 'Mute Mic', 'Push Talk', 'BGM -', 'BGM +', 'Chat Pin', 'Clip', 'Overlay 1', 'Overlay 2', 'Cam 1', 'Cam 2', 'Record', 'Go Live'],
+        music: ['Kick', 'Snare', 'Hat', 'Bass', 'Mute', 'Solo', 'Undo', 'Redo', 'Oct +', 'Oct -', 'Chord 1', 'Chord 2', 'FX A', 'FX B', 'Loop', 'Export'],
+      };
+
+      const presetButtons = Array.from(document.querySelectorAll('.macro-preset-btn'));
+
+      function applyPreset(name) {
+        const items = presetMaps[name] || presetMaps.editing;
+        keyCells.forEach((cell, index) => {
+          const label = cell.querySelector('.key-value');
+          if (label) label.textContent = items[index] || 'Action';
+        });
+        mappingLog.textContent = '已載入 Preset：' + name;
+      }
+
+      presetButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          presetButtons.forEach((item) => item.classList.remove('active'));
+          btn.classList.add('active');
+          applyPreset(btn.dataset.preset || 'editing');
+        });
+      });
+
+      actionButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          actionButtons.forEach((item) => item.classList.remove('active'));
+          btn.classList.add('active');
+          selectedAction = btn.dataset.action || 'Cut';
+          mappingLog.textContent = '目前選擇功能：' + selectedAction;
+        });
+      });
+
+      keyCells.forEach((cell) => {
+        cell.addEventListener('click', () => {
+          keyCells.forEach((item) => item.classList.remove('active'));
+          cell.classList.add('active');
+          const valueEl = cell.querySelector('.key-value');
+          if (valueEl) valueEl.textContent = selectedAction;
+          mappingLog.textContent = cell.dataset.key + ' 已映射為 ' + selectedAction;
+        });
+      });
+
+      const knobModeButtons = Array.from(document.querySelectorAll('.knob-mode-btn'));
+      const knobSlider = document.getElementById('knob-slider');
+      const knobValue = document.getElementById('knob-value');
+      const knobMode = document.getElementById('knob-mode');
+      const knobRing = document.getElementById('knob-ring');
+      const knobLog = document.getElementById('knob-log');
+      const knobCwFn = document.getElementById('knob-cw-fn');
+      const knobCcwFn = document.getElementById('knob-ccw-fn');
+      let currentMode = 'Timeline';
+
+      function renderKnob() {
+        const value = Number(knobSlider.value);
+        knobValue.textContent = String(value);
+        knobMode.textContent = currentMode.toUpperCase();
+        knobRing.style.setProperty('--knob-progress', value + '%');
+        const cw = knobCwFn ? knobCwFn.value : 'Next Frame';
+        const ccw = knobCcwFn ? knobCcwFn.value : 'Prev Frame';
+        knobLog.textContent = '模式：' + currentMode + '，輸出值：' + value + '，右旋：' + cw + '，左旋：' + ccw;
+      }
+
+      knobModeButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          knobModeButtons.forEach((item) => item.classList.remove('active'));
+          btn.classList.add('active');
+          currentMode = btn.dataset.mode || 'Timeline';
+          renderKnob();
+        });
+      });
+
+      knobSlider.addEventListener('input', renderKnob);
+      if (knobCwFn) knobCwFn.addEventListener('change', renderKnob);
+      if (knobCcwFn) knobCcwFn.addEventListener('change', renderKnob);
+
+      renderKnob();
+
+      const macroProfiles = {
+        fps: ['Aim Assist On', 'Rapid Fire Mapped', 'Back Key Sprint'],
+        moba: ['Skill Combo Chain', 'Ping + Ward Combo', 'Ultimate Safety Delay'],
+        creator: ['Scene Switch', 'Record Toggle', 'Export Preset'],
+      };
+
+      const profileButtons = Array.from(document.querySelectorAll('.macro-profile-btn'));
+      const macroSteps = document.getElementById('macro-steps');
+      const macroLog = document.getElementById('macro-log');
+      const runMacro = document.getElementById('run-macro');
+      let selectedProfile = 'fps';
+
+      function renderProfile(profileKey) {
+        macroSteps.innerHTML = '';
+        (macroProfiles[profileKey] || []).forEach((step, index) => {
+          const el = document.createElement('div');
+          el.className = 'step-chip rounded-xl p-4';
+          el.innerHTML = '<p class="text-xs font-mono text-gray-400 tracking-widest mb-2">STEP 0' + (index + 1) + '</p><p class="text-sm text-white">' + step + '</p>';
+          macroSteps.appendChild(el);
+        });
+
+        const labels = {
+          fps: 'FPS 競技',
+          moba: 'MOBA 連招',
+          creator: 'Creator 快捷',
+        };
+
+        macroLog.textContent = '目前配置：' + labels[profileKey] + '，按下模擬可查看觸發順序。';
+      }
+
+      profileButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          profileButtons.forEach((item) => item.classList.remove('active'));
+          btn.classList.add('active');
+          selectedProfile = btn.dataset.profile || 'fps';
+          renderProfile(selectedProfile);
+        });
+      });
+
+      runMacro.addEventListener('click', () => {
+        const steps = macroProfiles[selectedProfile] || [];
+        if (!steps.length) return;
+        macroLog.textContent = '模擬執行：' + steps.join(' → ');
+      });
+
+      applyPreset('editing');
+      renderProfile(selectedProfile);
+    })();
+  </script>
+</body>
+</html>
