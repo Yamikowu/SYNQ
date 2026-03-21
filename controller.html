@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Controller — SYNQ AI 硬體生態系</title>
+  <meta name="description" content="AI 仿生溫控競技手把，可恆溫握把、可替換軸體、TMR 搖桿、六背鍵、自適應扳機。重新定義實體觸感。">
+
+  <!-- ===================== Tailwind CSS CDN ===================== -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'ice':    '#5ee6ff',
+            'neon':   '#a855f7',
+            'dark':   '#070b14',
+            'dark2':  '#0e1628',
+            'dark3':  '#152238',
+            'glass':  'rgba(21,34,56,0.48)',
+          },
+          fontFamily: {
+            sans: ['Space Grotesk', 'ui-sans-serif', 'system-ui'],
+            mono: ['Chakra Petch', 'ui-monospace'],
+          },
+          keyframes: {
+            'glow-pulse': {
+              '0%, 100%': { boxShadow: '0 0 8px #7dd3fc55, 0 0 20px #7dd3fc22' },
+              '50%':       { boxShadow: '0 0 18px #7dd3fcaa, 0 0 40px #7dd3fc44' },
+            },
+            'neon-pulse': {
+              '0%, 100%': { boxShadow: '0 0 8px #a855f755, 0 0 20px #a855f722' },
+              '50%':       { boxShadow: '0 0 18px #a855f7aa, 0 0 40px #a855f744' },
+            },
+            'float': {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%':       { transform: 'translateY(-14px)' },
+            },
+          },
+          animation: {
+            'glow-pulse': 'glow-pulse 2.5s ease-in-out infinite',
+            'neon-pulse': 'neon-pulse 2.5s ease-in-out infinite',
+            'float':      'float 5s ease-in-out infinite',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- ===================== Google Fonts ===================== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- ===================== AOS (Animate On Scroll) ===================== -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+  <!-- ===================== 自訂樣式表 ===================== -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body class="antialiased">
+
+  <!-- 滾動進度指示條 -->
+  <div id="scroll-bar"></div>
+
+  <!-- =====================================================
+       HEADER — 頂部導覽列
+  ====================================================== -->
+  <header class="glass-nav fixed top-0 left-0 right-0 z-50">
+    <nav class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo -->
+        <a href="index.html" class="flex items-center gap-2 group" aria-label="SYNQ 首頁">
+          <div class="w-7 h-7 relative">
+            <div class="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-0.5">
+              <div class="bg-ice rounded-sm animate-glow-pulse"></div>
+              <div class="bg-white/20 rounded-sm"></div>
+              <div class="bg-white/20 rounded-sm"></div>
+              <div class="bg-neon rounded-sm animate-neon-pulse"></div>
+            </div>
+          </div>
+          <span class="text-white font-black text-xl tracking-[0.15em] font-mono group-hover:text-ice transition-colors duration-300">SYNQ</span>
+        </a>
+
+        <!-- 桌面版中間選單 -->
+        <ul class="hidden lg:flex items-center gap-8" role="list">
+          <li><a href="controller.html" class="text-sm font-medium text-ice tracking-wide">Controller</a></li>
+          <li><a href="keyboard.html" class="text-sm font-medium text-gray-400 hover:text-ice transition-colors duration-200 tracking-wide">Keyboard</a></li>
+          <li><a href="macro.html" class="text-sm font-medium text-gray-400 hover:text-ice transition-colors duration-200 tracking-wide">Macro</a></li>
+          <li><a href="software.html" class="text-sm font-medium text-gray-400 hover:text-ice transition-colors duration-200 tracking-wide">Download</a></li>
+        </ul>
+
+        <!-- 右側 CTA + 漢堡 -->
+        <div class="flex items-center gap-4">
+          <a href="#waitlist" class="btn-waitlist hidden lg:inline-flex items-center gap-2 px-5 py-2 rounded-lg text-white text-sm font-semibold">
+            Join Waitlist
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+
+          <!-- 漢堡選單按鈕 (行動版) -->
+          <button id="ham-btn" class="lg:hidden flex flex-col justify-center gap-[6px] w-8 h-8 focus:outline-none" aria-label="開啟選單" aria-expanded="false">
+            <span class="ham-line block h-px bg-white w-6"></span>
+            <span class="ham-line block h-px bg-white w-6"></span>
+            <span class="ham-line block h-px bg-white w-4"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 行動版展開選單 -->
+      <div id="mobile-menu" class="lg:hidden" role="navigation" aria-label="行動版選單">
+        <div class="py-4 border-t border-white/05 flex flex-col gap-1">
+          <a href="controller.html"  class="px-3 py-3 text-sm text-ice hover:bg-white/5 rounded-lg transition-all">Controller</a>
+          <a href="keyboard.html" class="px-3 py-3 text-sm text-gray-300 hover:text-ice hover:bg-white/5 rounded-lg transition-all">Keyboard</a>
+          <a href="macro.html" class="px-3 py-3 text-sm text-gray-300 hover:text-ice hover:bg-white/5 rounded-lg transition-all">Macro</a>
+          <a href="software.html" class="px-3 py-3 text-sm text-gray-300 hover:text-ice hover:bg-white/5 rounded-lg transition-all">Software</a>
+          <div class="pt-3 pb-1">
+            <a href="#waitlist" class="btn-waitlist flex items-center justify-center gap-2 w-full py-3 rounded-lg text-white text-sm font-semibold">
+              Join Waitlist →
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- =====================================================
+       MAIN — 主內容區塊
+  ====================================================== -->
+  <main>
+
+    <!-- =====================================================
+         SECTION 1 — Hero (產品主視覺)
+    ====================================================== -->
+    <section id="hero" class="hero-bg min-h-screen flex flex-col items-center justify-center relative overflow-hidden pt-16">
+      <!-- 背景裝飾光暈 -->
+      <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full pointer-events-none"
+           style="background: radial-gradient(circle, rgba(125,211,252,0.06) 0%, transparent 70%);"></div>
+      <div class="absolute bottom-20 right-1/4 w-64 h-64 rounded-full pointer-events-none"
+           style="background: radial-gradient(circle, rgba(168,85,247,0.07) 0%, transparent 70%);"></div>
+
+      <!-- 頂部標籤 -->
+      <div class="flex items-center gap-3 mb-8" data-aos="fade-down" data-aos-duration="800">
+        <div class="h-px w-12 bg-ice/40"></div>
+        <span class="badge bg-ice/10 text-ice border border-ice/20">AI Bionic Gamepad</span>
+        <div class="h-px w-12 bg-ice/40"></div>
+      </div>
+
+      <!-- 主標題 -->
+      <div class="text-center px-6 max-w-5xl mx-auto">
+        <h1 class="hero-title text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black mb-6"
+            data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
+          AI Controller
+        </h1>
+        <p class="text-gray-400 text-lg sm:text-xl md:text-2xl font-light max-w-2xl mx-auto leading-relaxed"
+           data-aos="fade-up" data-aos-duration="1000" data-aos-delay="250">
+          可恆溫握把 · 可替換軸體 · TMR 搖桿 · 六背鍵 · 自適應扳機
+        </p>
+      </div>
+
+      <!-- 產品圖片區塊 -->
+      <div class="mt-16 w-full max-w-3xl mx-auto px-6"
+           data-aos="fade-up" data-aos-duration="1200" data-aos-delay="550">
+        <div class="animate-float">
+          <div class="block rounded-2xl aspect-[16/9] overflow-hidden ice-glow">
+            <img src="assets/img/controller/front.png" alt="AI Controller" class="w-full h-full object-cover">
+          </div>
+        </div>
+      </div>
+
+      <!-- 向下滾動提示 -->
+      <div class="absolute bottom-8 inset-x-0 flex justify-center pointer-events-none">
+        <div class="flex flex-col items-center gap-2 animate-bounce"
+             data-aos="fade-up" data-aos-delay="900">
+          <span class="text-xs font-mono text-white/30 tracking-widest">SCROLL</span>
+          <div class="h-8 w-px bg-gradient-to-b from-ice/40 to-transparent"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 區塊分隔線 -->
+    <div class="divider"></div>
+
+    <!-- =====================================================
+         SECTION 2 — 產品特色（創意排版）
+    ====================================================== -->
+    <section id="features" class="py-28 px-6 max-w-7xl mx-auto">
+      <!-- 區塊標題 -->
+      <div class="mb-16 text-center" data-aos="fade-up">
+        <span class="badge bg-neon/10 text-neon border border-neon/20 mb-4 inline-block">Features</span>
+        <h2 class="text-4xl md:text-5xl font-black text-white">
+          重新定義<br/><span class="text-ice">實體觸感</span>
+        </h2>
+      </div>
+
+      <!-- 創意排版網格 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- 特色 1：可恆溫握把 (點擊滾動到 structure) -->
+        <article class="glass-card group rounded-2xl p-8 relative overflow-hidden cursor-pointer"
+                 data-aos="fade-up" data-aos-delay="0" onclick="scrollToSection('structure')">
+          <div class="absolute -top-12 -right-12 w-32 h-32 rounded-full pointer-events-none"
+               style="background: radial-gradient(circle, rgba(125,211,252,0.12) 0%, transparent 70%);"></div>
+          <div class="relative z-10">
+            <div class="w-12 h-12 rounded-full bg-ice/20 flex items-center justify-center mb-6">
+              <svg class="w-6 h-6 text-ice" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-3">可恆溫握把</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              內建智能溫控系統，根據手部溫度自動調節，長時間遊玩也能保持舒適握感。
+            </p>
+          </div>
+        </article>
+
+        <!-- 特色 2：可替換軸體 (點擊滾動到 structure) -->
+        <article class="glass-card group rounded-2xl p-8 relative overflow-hidden cursor-pointer"
+                 data-aos="fade-up" data-aos-delay="100" onclick="scrollToSection('structure')">
+          <div class="absolute -bottom-8 -left-8 w-32 h-32 rounded-full pointer-events-none"
+               style="background: radial-gradient(circle, rgba(168,85,247,0.12) 0%, transparent 70%);"></div>
+          <div class="relative z-10">
+            <div class="w-12 h-12 rounded-full bg-neon/20 flex items-center justify-center mb-6">
+              <svg class="w-6 h-6 text-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-3">可替換軸體</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              模組化按鍵設計，支援多種軸體類型，自由調整觸發力度與回饋感。
+            </p>
+          </div>
+        </article>
+
+        <!-- 特色 3：TMR 搖桿 (點擊滾動到 structure) -->
+        <article class="glass-card group rounded-2xl p-8 relative overflow-hidden cursor-pointer"
+                 data-aos="fade-up" data-aos-delay="200" onclick="scrollToSection('structure')">
+          <div class="absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none"
+               style="background: radial-gradient(circle, rgba(125,211,252,0.09) 0%, transparent 70%);"></div>
+          <div class="relative z-10">
+            <div class="w-12 h-12 rounded-full bg-ice/20 flex items-center justify-center mb-6">
+              <svg class="w-6 h-6 text-ice" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v4m0 12v4m10-10h-4M6 12H2" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-3">可調節阻尼 TMR 搖桿</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              磁阻技術提供精準控制，阻尼可調節，適應不同遊戲需求。
+            </p>
+          </div>
+        </article>
+
+        <!-- 特色 4：六背鍵 (點擊滾動到 back-buttons) -->
+        <article class="glass-card group rounded-2xl p-8 relative overflow-hidden cursor-pointer"
+                 data-aos="fade-up" data-aos-delay="300" onclick="scrollToSection('back-buttons')">
+          <div class="absolute -bottom-8 -right-8 w-32 h-32 rounded-full pointer-events-none"
+               style="background: radial-gradient(circle, rgba(168,85,247,0.12) 0%, transparent 70%);"></div>
+          <div class="relative z-10">
+            <div class="w-12 h-12 rounded-full bg-neon/20 flex items-center justify-center mb-6">
+              <svg class="w-6 h-6 text-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-3">六背鍵</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              六個可程式化背鍵，支援巨集設定，操作更直覺高效。
+            </p>
+          </div>
+        </article>
+
+        <!-- 特色 5：可切換扳機行程 (點擊滾動到 back-buttons) -->
+        <article class="glass-card group rounded-2xl p-8 relative overflow-hidden cursor-pointer"
+                 data-aos="fade-up" data-aos-delay="400" onclick="scrollToSection('back-buttons')">
+          <div class="absolute -top-12 -left-12 w-32 h-32 rounded-full pointer-events-none"
+               style="background: radial-gradient(circle, rgba(125,211,252,0.1) 0%, transparent 70%);"></div>
+          <div class="relative z-10">
+            <div class="w-12 h-12 rounded-full bg-ice/20 flex items-center justify-center mb-6">
+              <svg class="w-6 h-6 text-ice" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-3">可切換扳機行程</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              短行程與長行程模式自由切換，適應射擊與賽車遊戲需求。
+            </p>
+          </div>
+        </article>
+
+        <!-- 特色 6：自適應扳機 (點擊滾動到 back-buttons) -->
+        <article class="glass-card group rounded-2xl p-8 relative overflow-hidden cursor-pointer"
+                 data-aos="fade-up" data-aos-delay="500" onclick="scrollToSection('back-buttons')">
+          <div class="absolute -bottom-8 -left-8 w-32 h-32 rounded-full pointer-events-none"
+               style="background: radial-gradient(circle, rgba(168,85,247,0.1) 0%, transparent 70%);"></div>
+          <div class="relative z-10">
+            <div class="w-12 h-12 rounded-full bg-neon/20 flex items-center justify-center mb-6">
+              <svg class="w-6 h-6 text-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-3">自適應扳機</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              AI 自動調整扳機阻力，根據遊戲情境提供最佳觸發回饋。
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- 區塊分隔線 -->
+    <div class="divider mx-6 md:mx-20"></div>
+
+    <!-- =====================================================
+         SECTION 3 — 結構爆炸圖
+    ====================================================== -->
+    <section id="structure" class="py-28 px-6 max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <!-- 左側文字 -->
+        <div data-aos="fade-right" data-aos-duration="900">
+          <span class="badge bg-ice/10 text-ice border border-ice/20 mb-5 inline-block">Structure</span>
+          <h2 class="text-4xl md:text-5xl font-black text-white leading-tight mb-6">
+            精密結構<br/>
+            <span class="text-ice">工藝之美</span>
+          </h2>
+          <p class="text-gray-400 text-lg leading-relaxed mb-8">
+            採用航空級鋁合金框架，內部結構精密設計，每個零件都經過精心調校，提供最佳的耐用性與手感。
+          </p>
+
+          <!-- 結構特色清單 -->
+          <ul class="space-y-4 mb-10">
+            <li class="flex items-start gap-3 text-gray-300 text-sm">
+              <span class="flex-shrink-0 w-5 h-5 rounded-full border border-ice/30 flex items-center justify-center mt-0.5">
+                <svg class="w-3 h-3 text-ice" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </span>
+              <span>航空級鋁合金框架，輕量化設計</span>
+            </li>
+            <li class="flex items-start gap-3 text-gray-300 text-sm">
+              <span class="flex-shrink-0 w-5 h-5 rounded-full border border-ice/30 flex items-center justify-center mt-0.5">
+                <svg class="w-3 h-3 text-ice" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </span>
+              <span>模組化設計，易於維修與升級</span>
+            </li>
+            <li class="flex items-start gap-3 text-gray-300 text-sm">
+              <span class="flex-shrink-0 w-5 h-5 rounded-full border border-ice/30 flex items-center justify-center mt-0.5">
+                <svg class="w-3 h-3 text-ice" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </span>
+              <span>防汗防滑塗層，長時間使用更舒適</span>
+            </li>
+          </ul>
+
+          <a href="#waitlist" class="inline-flex items-center gap-2 text-ice text-sm font-semibold hover:gap-4 transition-all duration-300 group">
+            了解更多結構細節
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </a>
+        </div>
+
+        <!-- 右側結構爆炸圖 -->
+        <div data-aos="fade-left" data-aos-duration="900" data-aos-delay="150">
+          <div class="relative">
+            <!-- 結構爆炸圖容器 -->
+            <div class="rounded-2xl aspect-square flex items-center justify-center relative ice-glow overflow-hidden">
+              <img src="assets/img/controller/bang.png" alt="Controller Structure" class="w-full h-full object-contain">
+              
+              <!-- 標註點 -->
+              <div class="absolute top-[48%] left-[10%] w-4 h-4 bg-neon rounded-full animate-pulse cursor-pointer group structure-point feature-point"
+                   data-feature-name="恆溫握把"
+                   data-description="握把內建溫控模組，可依手部狀態動態調節溫度，長時間遊玩仍維持舒適觸感。"
+                   data-aos="fade-in" data-aos-delay="300">
+                <div class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-dark2 px-3 py-1 rounded text-xs text-neon opacity-0 group-hover:opacity-100 transition-opacity">
+                  恆溫握把
+                </div>
+              </div>
+              <div class="absolute top-[35%] left-[75%] w-4 h-4 bg-neon rounded-full animate-pulse cursor-pointer group structure-point feature-point"
+                   data-feature-name="TMR 搖桿"
+                   data-description="採用可調節阻尼的 TMR 搖桿，提供更精準的輸入控制與穩定回饋。"
+                   data-aos="fade-in" data-aos-delay="400">
+                <div class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-dark2 px-3 py-1 rounded text-xs text-neon opacity-0 group-hover:opacity-100 transition-opacity">
+                  TMR 搖桿
+                </div>
+              </div>
+              <div class="absolute top-[40%] left-[48%] w-4 h-4 bg-ice rounded-full animate-pulse cursor-pointer group structure-point feature-point"
+                   data-feature-name="自適應扳機"
+                   data-description="自適應扳機可依遊戲情境改變行程與阻力，強化射擊與競速的沉浸體驗。"
+                   data-aos="fade-in" data-aos-delay="500">
+                <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-dark2 px-3 py-1 rounded text-xs text-ice opacity-0 group-hover:opacity-100 transition-opacity">
+                  自適應扳機
+                </div>
+              </div>
+            </div>
+
+            <!-- 圖例 -->
+            <div class="flex justify-center gap-6 mt-6">
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full bg-ice"></div>
+                <span class="text-xs text-gray-400">主要組件</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full bg-neon"></div>
+                <span class="text-xs text-gray-400">電子元件</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 區塊分隔線 -->
+    <div class="divider mx-6 md:mx-20"></div>
+
+    <!-- =====================================================
+         SECTION 3.5 — 背鍵功能介紹
+    ====================================================== -->
+    <section id="back-buttons" class="py-28 px-6 max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <!-- 左側背鍵圖片 -->
+        <div data-aos="fade-right" data-aos-duration="900">
+          <div class="relative">
+            <div class="rounded-2xl aspect-square flex items-center justify-center relative ice-glow overflow-hidden">
+              <img src="assets/img/controller/back.png" alt="Controller Back Buttons" class="w-full h-full object-contain">
+              
+              <!-- 背鍵標註點 -->
+              <div class="absolute top-[45%] left-[35%] w-4 h-4 bg-neon rounded-full animate-pulse cursor-pointer group feature-point"
+                   data-feature-name="背鍵 1-3"
+                   data-description="三個可程式化背鍵，支援巨集設定。"
+                   data-aos="fade-in" data-aos-delay="200">
+                <div class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-dark2 px-3 py-1 rounded text-xs text-neon opacity-0 group-hover:opacity-100 transition-opacity">
+                  背鍵 1-3
+                </div>
+              </div>
+              <div class="absolute top-[55%] left-[60%] w-4 h-4 bg-neon rounded-full animate-pulse cursor-pointer group feature-point"
+                   data-feature-name="背鍵 4-6"
+                   data-description="另外三個可程式化背鍵，操作更直覺。"
+                   data-aos="fade-in" data-aos-delay="300">
+                <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-dark2 px-3 py-1 rounded text-xs text-neon opacity-0 group-hover:opacity-100 transition-opacity">
+                  背鍵 4-6
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右側背鍵功能介紹 + Software UI -->
+        <div data-aos="fade-left" data-aos-duration="900" data-aos-delay="150">
+          <span class="badge bg-neon/10 text-neon border border-neon/20 mb-5 inline-block">Back Design</span>
+          <h2 class="text-4xl md:text-5xl font-black text-white leading-tight mb-6">
+            六背鍵<br/>
+            <span class="text-neon">自由設定</span>
+          </h2>
+          <p class="text-gray-400 text-lg leading-relaxed mb-8">
+            六個可程式化背鍵，支援巨集設定，操作更直覺高效。透過 SYNQ Hub 軟體，您可以輕鬆自定義每個按鍵的功能。
+          </p>
+
+          <!-- 背鍵功能清單 -->
+          <ul class="space-y-3 mb-10">
+            <li class="flex items-center gap-3 text-gray-300 text-sm">
+              <span class="flex-shrink-0 w-5 h-5 rounded-full border border-neon/30 flex items-center justify-center">
+                <svg class="w-3 h-3 text-neon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </span>
+              <span>六個獨立可程式化按鍵</span>
+            </li>
+            <li class="flex items-center gap-3 text-gray-300 text-sm">
+              <span class="flex-shrink-0 w-5 h-5 rounded-full border border-neon/30 flex items-center justify-center">
+                <svg class="w-3 h-3 text-neon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </span>
+              <span>支援巨集與組合鍵設定</span>
+            </li>
+            <li class="flex items-center gap-3 text-gray-300 text-sm">
+              <span class="flex-shrink-0 w-5 h-5 rounded-full border border-neon/30 flex items-center justify-center">
+                <svg class="w-3 h-3 text-neon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </span>
+              <span>透過 SYNQ Hub 軟體設定</span>
+            </li>
+          </ul>
+
+          <!-- Software UI 示意圖 -->
+          <div class="glass-card rounded-xl p-4 relative overflow-hidden">
+            <div class="flex items-center gap-4">
+              <!-- 軟體圖示 -->
+              <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-ice/20 to-neon/20 flex items-center justify-center flex-shrink-0">
+                <svg class="w-8 h-8 text-ice" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <!-- 軟體資訊 -->
+              <div class="flex-1">
+                <h4 class="text-white font-semibold mb-1">SYNQ Hub</h4>
+                <p class="text-gray-400 text-xs">官方設定軟體 · 支援 Windows / macOS</p>
+              </div>
+              <!-- 設定按鈕 -->
+              <button onclick="window.location.href='software.html'"
+                      class="btn-waitlist px-4 py-2 rounded-lg text-white text-xs font-semibold">
+                下載設定軟體
+              </button>
+            </div>
+            
+            <!-- 軟體功能預覽 -->
+            <div class="mt-4 pt-4 border-t border-white/10">
+              <div class="grid grid-cols-3 gap-2">
+                <div class="text-center">
+                  <div class="w-8 h-8 mx-auto rounded bg-neon/20 flex items-center justify-center mb-1">
+                    <span class="text-neon text-xs font-bold">1</span>
+                  </div>
+                  <p class="text-gray-400 text-xs">選擇按鍵</p>
+                </div>
+                <div class="text-center">
+                  <div class="w-8 h-8 mx-auto rounded bg-ice/20 flex items-center justify-center mb-1">
+                    <span class="text-ice text-xs font-bold">2</span>
+                  </div>
+                  <p class="text-gray-400 text-xs">設定功能</p>
+                </div>
+                <div class="text-center">
+                  <div class="w-8 h-8 mx-auto rounded bg-white/10 flex items-center justify-center mb-1">
+                    <span class="text-white text-xs font-bold">3</span>
+                  </div>
+                  <p class="text-gray-400 text-xs">儲存設定</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 區塊分隔線 -->
+    <div class="divider"></div>
+
+    <!-- =====================================================
+         SECTION 4 — 規格表
+    ====================================================== -->
+    <section id="specs" class="py-28 px-6 max-w-4xl mx-auto">
+      <div class="text-center mb-16" data-aos="fade-up">
+        <span class="badge bg-neon/10 text-neon border border-neon/20 mb-4 inline-block">Specifications</span>
+        <h2 class="text-4xl md:text-5xl font-black text-white">
+          規格參數
+        </h2>
+      </div>
+
+      <!-- 規格表網格 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-aos="fade-up" data-aos-delay="100">
+        <div class="glass-card rounded-xl p-6">
+          <h3 class="text-sm font-mono text-ice mb-4 tracking-widest">基本規格</h3>
+          <ul class="space-y-3 text-sm">
+            <li class="flex justify-between text-gray-300">
+              <span>連接方式</span>
+              <span class="text-white">2.4GHz / 藍牙 5.0 / USB-C</span>
+            </li>
+            <li class="flex justify-between text-gray-300">
+              <span>電池續航</span>
+              <span class="text-white">約 40 小時</span>
+            </li>
+            <li class="flex justify-between text-gray-300">
+              <span>重量</span>
+              <span class="text-white">約 280g</span>
+            </li>
+            <li class="flex justify-between text-gray-300">
+              <span>尺寸</span>
+              <span class="text-white">160 x 110 x 65 mm</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="glass-card rounded-xl p-6">
+          <h3 class="text-sm font-mono text-neon mb-4 tracking-widest">進階功能</h3>
+          <ul class="space-y-3 text-sm">
+            <li class="flex justify-between text-gray-300">
+              <span>搖桿解析度</span>
+              <span class="text-white">4096 級</span>
+            </li>
+            <li class="flex justify-between text-gray-300">
+              <span>按鍵壽命</span>
+              <span class="text-white">約 5000 萬次</span>
+            </li>
+            <li class="flex justify-between text-gray-300">
+              <span>回應時間</span>
+              <span class="text-white">< 1ms</span>
+            </li>
+            <li class="flex justify-between text-gray-300">
+              <span>支援平台</span>
+              <span class="text-white">PC / PS5 / Switch / Mobile</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 區塊分隔線 -->
+    <div class="divider"></div>
+
+    <!-- =====================================================
+         SECTION 5 — Waitlist CTA
+    ====================================================== -->
+    <section id="waitlist" class="py-28 px-6">
+      <div class="max-w-3xl mx-auto text-center" data-aos="fade-up" data-aos-duration="900">
+        <span class="badge bg-neon/10 text-neon border border-neon/20 mb-5 inline-block">Early Access</span>
+        <h2 class="text-4xl md:text-5xl font-black text-white mb-5 leading-tight">
+          搶先體驗<br/>
+          <span class="text-ice">AI 控制器</span>
+        </h2>
+        <p class="text-gray-400 text-lg mb-10 leading-relaxed">
+          加入候補名單，搶先體驗 SYNQ AI 控制器，並享有早鳥獨家折扣與測試資格。
+        </p>
+        <form class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto" onsubmit="handleWaitlist(event)">
+          <input
+            type="email"
+            id="waitlist-email"
+            placeholder="your@email.com"
+            required
+            class="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-gray-500 text-sm
+                   focus:outline-none focus:border-ice/50 focus:bg-white/10 transition-all duration-300"
+          />
+          <button type="submit" class="btn-waitlist px-7 py-4 rounded-xl text-white font-bold text-sm whitespace-nowrap">
+            Join Now
+          </button>
+        </form>
+        <p id="waitlist-msg" class="mt-4 text-sm text-ice opacity-0 transition-opacity duration-500"></p>
+        <p class="mt-4 text-xs text-gray-600">不會發送垃圾郵件，隨時可取消訂閱。</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =====================================================
+       FOOTER — 頁尾
+  ====================================================== -->
+  <footer class="border-t border-white/06 bg-dark">
+    <div class="max-w-7xl mx-auto px-6 py-16">
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 mb-14">
+        <!-- 品牌欄 -->
+        <div class="col-span-2 lg:col-span-2">
+          <div class="flex items-center gap-2 mb-5">
+            <div class="w-6 h-6 relative">
+              <div class="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-0.5">
+                <div class="bg-ice rounded-sm"></div>
+                <div class="bg-white/15 rounded-sm"></div>
+                <div class="bg-white/15 rounded-sm"></div>
+                <div class="bg-neon rounded-sm"></div>
+              </div>
+            </div>
+            <span class="text-white font-black text-lg tracking-[0.15em] font-mono">SYNQ</span>
+          </div>
+          <p class="text-gray-500 text-sm leading-relaxed max-w-xs mb-6">
+            次世代 AI 硬體生態系。<br/>
+            融合人工智慧與實體觸感，重新定義你與科技的連結。
+          </p>
+          <!-- 社群 Icon -->
+          <div class="flex items-center gap-2" aria-label="社群媒體連結">
+            <a href="#" class="social-btn" aria-label="X (Twitter)">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="#" class="social-btn" aria-label="Instagram">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+            </a>
+            <a href="#" class="social-btn" aria-label="YouTube">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </a>
+            <a href="#" class="social-btn" aria-label="GitHub">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Products 欄 -->
+        <div>
+          <h4 class="text-xs font-mono font-bold tracking-widest text-gray-500 uppercase mb-5">Products</h4>
+          <ul class="space-y-3">
+            <li><a href="controller.html" class="footer-link">AI Controller</a></li>
+            <li><a href="keyboard.html" class="footer-link">OLED Keyboard</a></li>
+            <li><a href="macro.html"    class="footer-link">Macro Deck</a></li>
+          </ul>
+        </div>
+
+        <!-- Software 欄 -->
+        <div>
+          <h4 class="text-xs font-mono font-bold tracking-widest text-gray-500 uppercase mb-5">Software</h4>
+          <ul class="space-y-3">
+            <li><a href="software.html" class="footer-link">SYNQ Hub</a></li>
+            <li><a href="#"             class="footer-link">SDK & API</a></li>
+            <li><a href="#"             class="footer-link">Community</a></li>
+          </ul>
+        </div>
+
+        <!-- Company 欄 -->
+        <div>
+          <h4 class="text-xs font-mono font-bold tracking-widest text-gray-500 uppercase mb-5">Company</h4>
+          <ul class="space-y-3">
+            <li><a href="#" class="footer-link">About</a></li>
+            <li><a href="#" class="footer-link">Press</a></li>
+            <li><a href="#" class="footer-link">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 底部版權列 -->
+      <div class="pt-8 border-t border-white/06 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-xs text-gray-600 font-mono">
+          © 2026 SYNQ Technologies Inc. All rights reserved.
+        </p>
+        <div class="flex items-center gap-6">
+          <a href="#" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">Privacy Policy</a>
+          <a href="#" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">Terms of Service</a>
+          <div class="flex items-center gap-1.5">
+            <div class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
+            <span class="text-xs text-gray-600 font-mono">All Systems Operational</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script src="js/script.js"></script>
+  
+  <!-- Controller 專屬 JavaScript -->
+  <script>
+    // 滾動到指定區塊的函數
+    function scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // 點點點擊顯示功能介紹（開關式，在點擊位置顯示）
+    function toggleFeatureInfo(event, featureName, description) {
+      event.stopPropagation(); // 防止事件冒泡
+      
+      // 創建或更新提示框
+      let tooltip = document.getElementById('feature-tooltip');
+      if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.id = 'feature-tooltip';
+        tooltip.className = 'fixed z-50 bg-dark2 border border-ice/30 rounded-lg px-4 py-3 max-w-xs shadow-lg transition-opacity duration-200';
+        document.body.appendChild(tooltip);
+      }
+      
+      // 檢查是否已經顯示且是同一個點點
+      if (tooltip.style.opacity === '1' && tooltip.dataset.target === event.target.id) {
+        // 如果已經顯示且是同一個點點，則隱藏
+        tooltip.style.opacity = '0';
+        return;
+      }
+      
+      // 設置提示框內容和位置
+      tooltip.innerHTML = `
+        <div class="text-ice font-semibold mb-1">${featureName}</div>
+        <div class="text-gray-300 text-sm">${description}</div>
+      `;
+      
+      // 設置位置在點擊點附近
+      const rect = event.target.getBoundingClientRect();
+      tooltip.style.left = rect.left + 'px';
+      tooltip.style.top = (rect.top - 80) + 'px';
+      tooltip.style.transform = 'translateX(-50%)';
+      tooltip.style.opacity = '1';
+      tooltip.dataset.target = event.target.id;
+    }
+
+    // 點擊其他地方隱藏提示框
+    document.addEventListener('click', function(event) {
+      const tooltip = document.getElementById('feature-tooltip');
+      if (tooltip && !tooltip.contains(event.target)) {
+        tooltip.style.opacity = '0';
+      }
+    });
+
+    // 為照片上的點點添加點擊事件
+    document.addEventListener('DOMContentLoaded', function() {
+      // 背鍵與爆炸圖共用同一套點位綁定
+      const featurePoints = document.querySelectorAll('.feature-point');
+      featurePoints.forEach((point, index) => {
+        point.id = point.id || `feature-point-${index}`;
+        point.addEventListener('click', function(event) {
+          const featureName =
+            this.dataset.featureName ||
+            this.querySelector('div')?.textContent?.trim() ||
+            '組件';
+          const description = this.dataset.description || '點擊查看詳細資訊';
+          toggleFeatureInfo(event, featureName, description);
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
