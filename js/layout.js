@@ -2,9 +2,9 @@
   function getPageKey() {
     const file = window.location.pathname.split('/').pop() || 'index.html';
     if (file === 'controller.html') return 'controller';
-    if (file === 'keyboard.html') return 'keyboard';
     if (file === 'macro.html') return 'macro';
     if (file === 'software.html') return 'software';
+    if (file === 'coming.html' || file === '') return 'coming';
     return '';
   }
 

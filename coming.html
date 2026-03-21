@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upcoming Products — SYNQ</title>
+  <meta name="description" content="SYNQ 即將上市產品總覽。Neural Synth 與 AI Smart Keyboard 即將登場。" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-shared.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    .coming-noise {
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(94, 230, 255, 0.12), transparent 45%),
+        radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.12), transparent 50%);
+    }
+  </style>
+</head>
+
+<body class="antialiased font-sans">
+  <div id="scroll-bar"></div>
+  <div id="layout-navbar"></div>
+
+  <main>
+    <section class="hero-bg min-h-screen pt-24 pb-16 px-6 relative overflow-hidden">
+      <div class="absolute inset-0 coming-noise pointer-events-none"></div>
+
+      <div class="max-w-7xl mx-auto relative z-10">
+        <div class="max-w-4xl mx-auto text-center mb-12" data-aos="fade-up">
+          <span class="badge bg-white/10 text-white border border-white/15 mb-6 inline-block">Upcoming Products</span>
+          <h1 class="hero-title text-5xl md:text-7xl font-black text-white mb-6">
+            即將上市
+          </h1>
+          <p class="text-gray-300 text-lg leading-relaxed max-w-2xl mx-auto">
+            SYNQ 的產品線將持續擴展，結合創新技術與獨特設計，為創作者帶來更多元的工具。
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <article class="glass-card rounded-2xl overflow-hidden" data-aos="fade-up" data-aos-delay="0">
+          <div class="aspect-[16/10] overflow-hidden">
+            <img src="assets/img/synth.png" alt="Neural Synth" class="w-full h-full object-cover" />
+          </div>
+          <div class="p-7">
+            <p class="text-xs font-mono tracking-widest text-neon mb-3">NEURAL SYNTH</p>
+            <h2 class="text-3xl font-black text-white mb-4">手勢驅動的合成器</h2>
+            <p class="text-gray-300 leading-relaxed">
+              結合觸覺回饋與即時感測，讓創作可以用手勢、觸碰與空間距離去塑形。
+              適合聲音設計、即興演出與 AI 輔助音色探索。
+            </p>
+          </div>
+        </article>
+
+        <article class="glass-card rounded-2xl overflow-hidden" data-aos="fade-up" data-aos-delay="120">
+          <div class="aspect-[16/10] overflow-hidden">
+            <img src="assets/img/keyboard/keyboard.png" alt="AI Smart Keyboard" class="w-full h-full object-cover" />
+          </div>
+          <div class="p-7">
+            <p class="text-xs font-mono tracking-widest text-ice mb-3">AI OLED KEYBOARD</p>
+            <h2 class="text-3xl font-black text-white mb-4">逐鍵可視化的工作鍵盤</h2>
+            <p class="text-gray-300 leading-relaxed">
+              40% layout方便攜帶，以 OLED 鍵帽與情境自動切換為核心，讓快捷鍵不再需要背誦。
+              不同軟體可快速切換對應操作面板，縮短學習與切換成本。
+            </p>
+          </div>
+        </article>
+      </div>
+      </div>
+    </section>
+
+    <div class="divider mx-6 md:mx-20"></div>
+
+    <section id="waitlist" class="py-24 px-6">
+      <div class="max-w-3xl mx-auto text-center" data-aos="fade-up">
+        <span class="badge bg-neon/10 text-neon border border-neon/20 mb-5 inline-block">新品通知</span>
+        <h2 class="text-4xl md:text-5xl font-black text-white mb-5 leading-tight">
+          更多新品資訊即將公開
+        </h2>
+        <p class="text-gray-400 text-lg mb-10 leading-relaxed">
+          想第一時間收到上市時程、規格更新與首波體驗消息，歡迎加入候補名單。
+        </p>
+
+        <form class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto" onsubmit="handleWaitlist(event)">
+          <input
+            type="email"
+            id="waitlist-email"
+            placeholder="your@email.com"
+            required
+            class="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-gray-500 text-sm
+                   focus:outline-none focus:border-ice/50 focus:bg-white/10 transition-all duration-300"
+          />
+          <button type="submit" class="btn-waitlist px-7 py-4 rounded-xl text-white font-bold text-sm whitespace-nowrap">
+            Notify Me
+          </button>
+        </form>
+
+        <p id="waitlist-msg" class="mt-4 text-sm text-ice opacity-0 transition-opacity duration-500"></p>
+      </div>
+    </section>
+  </main>
+
+  <div id="layout-footer"></div>
+
+  <script src="js/script.js"></script>
+  <script src="js/layout-templates.js"></script>
+  <script src="js/layout.js"></script>
+</body>
+</html>
