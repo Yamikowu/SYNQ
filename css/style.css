@@ -196,6 +196,45 @@ body::after {
     var(--color-bg);
 }
 
+/* --- 6.4.1 Controller Hero 雨滴式斷續掃描線 --- */
+.controller-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(94, 230, 255, 0.12) 0px,
+      rgba(94, 230, 255, 0.12) 14px,
+      transparent 14px,
+      transparent 36px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      rgba(168, 85, 247, 0.08) 0px,
+      rgba(168, 85, 247, 0.08) 8px,
+      transparent 8px,
+      transparent 44px
+    );
+  background-size: 30px 220px, 62px 300px;
+  animation: controller-rain-lines 26s linear infinite, controller-rain-flicker 6s steps(6) infinite;
+  opacity: 0.36;
+  mask-image: radial-gradient(ellipse at 50% 30%, black 34%, transparent 86%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 34%, transparent 86%);
+}
+
+@keyframes controller-rain-lines {
+  from { background-position: 0 0, 12px -60px; }
+  to   { background-position: 0 260px, 12px 300px; }
+}
+
+@keyframes controller-rain-flicker {
+  0%, 100% { opacity: 0.28; }
+  25% { opacity: 0.38; }
+  50% { opacity: 0.46; }
+  75% { opacity: 0.34; }
+}
+
 /* --- 6.5 Hero 大標題文字漸層 --- */
 .hero-title {
   background: linear-gradient(110deg, #f8fbff 0%, #a7d6ff 34%, var(--color-ice) 58%, #d8b4fe 86%);

@@ -61,7 +61,7 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
-<body class="antialiased">
+<body class="antialiased font-sans">
 
   <!-- 滾動進度指示條 -->
   <div id="scroll-bar"></div>
@@ -137,6 +137,7 @@
          SECTION 1 — Hero (產品主視覺)
     ====================================================== -->
     <section id="hero" class="hero-bg min-h-screen flex flex-col items-center justify-center relative overflow-hidden pt-16">
+      <div class="controller-grid"></div>
       <!-- 背景裝飾光暈 -->
       <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full pointer-events-none"
            style="background: radial-gradient(circle, rgba(125,211,252,0.06) 0%, transparent 70%);"></div>
@@ -146,7 +147,7 @@
       <!-- 頂部標籤 -->
       <div class="flex items-center gap-3 mb-8" data-aos="fade-down" data-aos-duration="800">
         <div class="h-px w-12 bg-ice/40"></div>
-        <span class="badge bg-ice/10 text-ice border border-ice/20">AI Bionic Gamepad</span>
+        <span class="badge bg-ice/10 text-ice border border-ice/20">SYNQ Joystick</span>
         <div class="h-px w-12 bg-ice/40"></div>
       </div>
 
@@ -156,26 +157,36 @@
             data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
           AI Controller
         </h1>
-        <p class="text-gray-400 text-lg sm:text-xl md:text-2xl font-light max-w-2xl mx-auto leading-relaxed"
+        <p class="text-gray-300 text-base sm:text-lg md:text-xl max-w-3xl mx-auto leading-relaxed"
            data-aos="fade-up" data-aos-duration="1000" data-aos-delay="250">
-          可恆溫握把 · 可替換軸體 · TMR 搖桿 · 六背鍵 · 自適應扳機
+          可恆溫握把 × 可替換軸體 × TMR 搖桿 × 六背鍵 × 自適應扳機
         </p>
       </div>
 
+      <!-- Hero CTA 按鈕組 -->
+      <div class="flex flex-col sm:flex-row items-center gap-4 mt-10"
+           data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
+        <button onclick="scrollToSection('features')" class="btn-waitlist px-7 py-3 rounded-xl text-white text-sm font-bold">
+          看核心功能
+        </button>
+        <button onclick="scrollToSection('specs')" class="px-7 py-3 rounded-xl border border-white/15 hover:border-ice/40 text-gray-200 hover:text-white text-sm font-semibold transition-colors duration-300">
+          查看規格
+        </button>
+      </div>
+
       <!-- 產品圖片區塊 -->
-      <div class="mt-16 w-full max-w-3xl mx-auto px-6"
+      <div class="mt-16 w-full max-w-4xl mx-auto px-6"
            data-aos="fade-up" data-aos-duration="1200" data-aos-delay="550">
         <div class="animate-float">
-          <div class="block rounded-2xl aspect-[16/9] overflow-hidden ice-glow">
-            <img src="assets/img/controller/front.png" alt="AI Controller" class="w-full h-full object-cover">
-          </div>
+          <a href="#features" class="hero-controller-link block rounded-2xl aspect-[16/9] overflow-hidden ice-glow" aria-label="查看 AI Controller 特色">
+            <img src="assets/img/controller/front.png" alt="AI Controller" class="hero-controller-image w-full h-full object-cover">
+          </a>
         </div>
       </div>
 
       <!-- 向下滾動提示 -->
-      <div class="absolute bottom-8 inset-x-0 flex justify-center pointer-events-none">
-        <div class="flex flex-col items-center gap-2 animate-bounce"
-             data-aos="fade-up" data-aos-delay="900">
+      <div class="mt-8 flex justify-center pointer-events-none">
+        <div class="flex flex-col items-center gap-2 animate-bounce">
           <span class="text-xs font-mono text-white/30 tracking-widest">SCROLL</span>
           <div class="h-8 w-px bg-gradient-to-b from-ice/40 to-transparent"></div>
         </div>

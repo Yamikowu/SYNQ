@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Macro Deck — SYNQ Shift-16</title>
+  <meta name="description" content="SYNQ Shift-16：16 顆 OLED 按鍵、力回饋旋鈕、模組化佈局與多維方向控制，打造高效率創作控制中樞。" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'ice': '#5ee6ff',
+            'neon': '#a855f7',
+            'dark': '#070b14',
+            'dark2': '#0e1628',
+            'dark3': '#152238',
+            'glass': 'rgba(21,34,56,0.48)',
+          },
+          fontFamily: {
+            sans: ['Space Grotesk', 'ui-sans-serif', 'system-ui'],
+            mono: ['Chakra Petch', 'ui-monospace'],
+          },
+          keyframes: {
+            'glow-pulse': {
+              '0%, 100%': { boxShadow: '0 0 8px #7dd3fc55, 0 0 20px #7dd3fc22' },
+              '50%': { boxShadow: '0 0 18px #7dd3fcaa, 0 0 40px #7dd3fc44' },
+            },
+            'neon-pulse': {
+              '0%, 100%': { boxShadow: '0 0 8px #a855f755, 0 0 20px #a855f722' },
+              '50%': { boxShadow: '0 0 18px #a855f7aa, 0 0 40px #a855f744' },
+            },
+            'float': {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-12px)' },
+            },
+          },
+          animation: {
+            'glow-pulse': 'glow-pulse 2.5s ease-in-out infinite',
+            'neon-pulse': 'neon-pulse 2.5s ease-in-out infinite',
+            'float': 'float 5s ease-in-out infinite',
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    .signal-grid {
+      background-image:
+        linear-gradient(rgba(94, 230, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(94, 230, 255, 0.05) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(circle at center, black 40%, transparent 95%);
+      -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 95%);
+      animation: macro-grid-drift 20s linear infinite, macro-grid-flicker 4.8s steps(5) infinite;
+      opacity: 0.75;
+    }
+
+    @keyframes macro-grid-drift {
+      from { background-position: 0 0, 0 0; }
+      to { background-position: 28px 28px, -28px 28px; }
+    }
+
+    @keyframes macro-grid-flicker {
+      0%, 100% { opacity: 0.55; }
+      25% { opacity: 0.72; }
+      50% { opacity: 0.9; }
+      75% { opacity: 0.66; }
+    }
+
+    .view-btn.active {
+      border-color: rgba(94, 230, 255, 0.5);
+      background: rgba(94, 230, 255, 0.14);
+      color: #dff8ff;
+      box-shadow: 0 0 18px rgba(94, 230, 255, 0.18);
+    }
+
+    .spec-row {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .spec-row:last-child {
+      border-bottom: 0;
+    }
+  </style>
+</head>
+
+<body class="antialiased font-sans">
+  <div id="scroll-bar"></div>
+
+  <header class="glass-nav fixed top-0 left-0 right-0 z-50">
+    <nav class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="index.html" class="flex items-center gap-2 group" aria-label="SYNQ 首頁">
+          <div class="w-7 h-7 relative">
+            <div class="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-0.5">
+              <div class="bg-ice rounded-sm animate-glow-pulse"></div>
+              <div class="bg-white/20 rounded-sm"></div>
+              <div class="bg-white/20 rounded-sm"></div>
+              <div class="bg-neon rounded-sm animate-neon-pulse"></div>
+            </div>
+          </div>
+          <span class="text-white font-black text-xl tracking-[0.15em] font-mono group-hover:text-ice transition-colors duration-300">SYNQ</span>
+        </a>
+
+        <ul class="hidden lg:flex items-center gap-8" role="list">
+          <li><a href="controller.html" class="text-sm font-medium text-gray-400 hover:text-ice transition-colors duration-200 tracking-wide">Controller</a></li>
+          <li><a href="keyboard.html" class="text-sm font-medium text-gray-400 hover:text-ice transition-colors duration-200 tracking-wide">Keyboard</a></li>
+          <li><a href="macro.html" class="text-sm font-medium text-ice tracking-wide">Macro</a></li>
+          <li><a href="software.html" class="text-sm font-medium text-gray-400 hover:text-ice transition-colors duration-200 tracking-wide">Download</a></li>
+        </ul>
+
+        <div class="flex items-center gap-4">
+          <a href="#waitlist" class="btn-waitlist hidden lg:inline-flex items-center gap-2 px-5 py-2 rounded-lg text-white text-sm font-semibold">
+            Join Waitlist
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+
+          <button id="ham-btn" class="lg:hidden flex flex-col justify-center gap-[6px] w-8 h-8 focus:outline-none" aria-label="開啟選單" aria-expanded="false">
+            <span class="ham-line block h-px bg-white w-6"></span>
+            <span class="ham-line block h-px bg-white w-6"></span>
+            <span class="ham-line block h-px bg-white w-4"></span>
+          </button>
+        </div>
+      </div>
+
+      <div id="mobile-menu" class="lg:hidden" role="navigation" aria-label="行動版選單">
+        <div class="py-4 border-t border-white/05 flex flex-col gap-1">
+          <a href="controller.html" class="px-3 py-3 text-sm text-gray-300 hover:text-ice hover:bg-white/5 rounded-lg transition-all">Controller</a>
+          <a href="keyboard.html" class="px-3 py-3 text-sm text-gray-300 hover:text-ice hover:bg-white/5 rounded-lg transition-all">Keyboard</a>
+          <a href="macro.html" class="px-3 py-3 text-sm text-ice hover:bg-white/5 rounded-lg transition-all">Macro</a>
+          <a href="software.html" class="px-3 py-3 text-sm text-gray-300 hover:text-ice hover:bg-white/5 rounded-lg transition-all">Software</a>
+          <div class="pt-3 pb-1">
+            <a href="#waitlist" class="btn-waitlist flex items-center justify-center gap-2 w-full py-3 rounded-lg text-white text-sm font-semibold">
+              Join Waitlist →
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section id="hero" class="hero-bg min-h-screen flex flex-col items-center justify-center relative overflow-hidden pt-20">
+      <div class="absolute inset-0 signal-grid pointer-events-none"></div>
+      <div class="absolute top-[18%] right-[8%] w-64 h-64 rounded-full pointer-events-none"
+           style="background: radial-gradient(circle, rgba(94,230,255,0.11), transparent 70%);"></div>
+      <div class="absolute bottom-[8%] left-[8%] w-72 h-72 rounded-full pointer-events-none"
+           style="background: radial-gradient(circle, rgba(168,85,247,0.12), transparent 72%);"></div>
+
+      <div class="relative z-10 text-center px-6 max-w-6xl mx-auto">
+        <div class="flex items-center justify-center gap-3 mb-7" data-aos="fade-down" data-aos-duration="800">
+          <div class="h-px w-12 bg-ice/40"></div>
+          <span class="badge bg-ice/10 text-ice border border-ice/20">SYNQ Shift-16</span>
+          <div class="h-px w-12 bg-ice/40"></div>
+        </div>
+
+        <h1 class="hero-title text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6" data-aos="fade-up" data-aos-duration="900" data-aos-delay="80">
+          Macro Deck<br /><span class="text-white">for Human Workflow</span>
+        </h1>
+
+        <p class="text-gray-300 text-base sm:text-lg md:text-xl max-w-3xl mx-auto leading-relaxed" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="180">
+          OLED 按鍵 · 力回饋旋鈕 · 模組化拼接
+        </p>
+
+        <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
+          <button onclick="scrollToSection('feature-core')" class="btn-waitlist px-7 py-3 rounded-xl text-white text-sm font-bold">
+            看核心功能
+          </button>
+          <button onclick="scrollToSection('specs')" class="px-7 py-3 rounded-xl border border-white/15 hover:border-ice/40 text-gray-200 hover:text-white text-sm font-semibold transition-colors duration-300">
+            查看規格
+          </button>
+        </div>
+      </div>
+
+      <div class="relative z-10 mt-14 w-full max-w-4xl mx-auto px-6" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="450">
+        <div class="animate-float">
+          <a href="#feature-core" class="hero-controller-link block rounded-2xl aspect-[16/9] overflow-hidden ice-glow" aria-label="查看 SYNQ Shift-16 核心功能">
+            <img src="assets/img/macro/macro.png" alt="SYNQ Shift-16 正面圖" class="hero-controller-image w-full h-full object-cover" />
+          </a>
+        </div>
+      </div>
+
+      <div class="mt-8 flex justify-center pointer-events-none">
+        <div class="flex flex-col items-center gap-2 animate-bounce">
+          <span class="text-xs font-mono text-white/30 tracking-widest">SCROLL</span>
+          <div class="h-8 w-px bg-gradient-to-b from-ice/40 to-transparent"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="feature-core" class="py-24 px-6 max-w-7xl mx-auto">
+      <div class="text-center mb-14" data-aos="fade-up">
+        <span class="badge bg-neon/10 text-neon border border-neon/20 mb-4 inline-block">Core Features</span>
+        <h2 class="text-4xl md:text-5xl font-black text-white">四大核心控制維度</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <article class="glass-card rounded-2xl p-7 relative overflow-hidden cursor-pointer" onclick="scrollToSection('oled')" data-aos="fade-up" data-aos-delay="0">
+          <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full" style="background: radial-gradient(circle, rgba(94,230,255,0.14), transparent 70%);"></div>
+          <p class="text-xs font-mono text-ice tracking-widest mb-3">CORE 01</p>
+          <h3 class="text-2xl font-bold text-white mb-4">OLED 按鍵</h3>
+          <p class="text-gray-400 leading-relaxed">16 顆高解析 OLED 自定義螢幕鍵，軟體辨識當前工作視窗，自動切換版面與功能。</p>
+        </article>
+
+        <article class="glass-card rounded-2xl p-7 relative overflow-hidden cursor-pointer" onclick="scrollToSection('haptic')" data-aos="fade-up" data-aos-delay="120">
+          <div class="absolute -bottom-10 -left-10 w-32 h-32 rounded-full" style="background: radial-gradient(circle, rgba(168,85,247,0.16), transparent 70%);"></div>
+          <p class="text-xs font-mono text-neon tracking-widest mb-3">CORE 02</p>
+          <h3 class="text-2xl font-bold text-white mb-4">力回饋旋鈕</h3>
+          <p class="text-gray-400 leading-relaxed">主動式力回饋馬達讓旋轉阻尼動態改變，將參數變化轉換為真實手感。</p>
+        </article>
+
+        <article class="glass-card rounded-2xl p-7 relative overflow-hidden cursor-pointer" onclick="scrollToSection('modular')" data-aos="fade-up" data-aos-delay="200">
+          <div class="absolute -top-8 left-1/2 -translate-x-1/2 w-36 h-36 rounded-full" style="background: radial-gradient(circle, rgba(94,230,255,0.11), transparent 70%);"></div>
+          <p class="text-xs font-mono text-ice tracking-widest mb-3">CORE 03</p>
+          <h3 class="text-2xl font-bold text-white mb-4">模組化佈局</h3>
+          <p class="text-gray-400 leading-relaxed">旋鈕模組與按鍵模組可熱插拔拼接，左、右、上、下自由卡榫重組。</p>
+        </article>
+
+        <article class="glass-card rounded-2xl p-7 relative overflow-hidden cursor-pointer" onclick="scrollToSection('dimension')" data-aos="fade-up" data-aos-delay="320">
+          <div class="absolute -bottom-10 right-0 w-36 h-36 rounded-full" style="background: radial-gradient(circle, rgba(168,85,247,0.14), transparent 70%);"></div>
+          <p class="text-xs font-mono text-neon tracking-widest mb-3">CORE 04</p>
+          <h3 class="text-2xl font-bold text-white mb-4">多維實體控制</h3>
+          <p class="text-gray-400 leading-relaxed">360° 旋轉加上上下左右實體推動，讓參數調整與方向選擇一次完成。</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="divider mx-6 md:mx-20"></div>
+
+    <section id="oled" class="py-24 px-6 max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <div data-aos="fade-right" data-aos-duration="900">
+          <span class="badge bg-ice/10 text-ice border border-ice/20 mb-5 inline-block">Core 01</span>
+          <h2 class="text-4xl md:text-5xl font-black text-white leading-tight mb-5">隨心而變，<br /><span class="text-ice">智在隨形</span></h2>
+          <p class="text-gray-300 text-lg leading-relaxed mb-7">SYNQ Shift-16 的 16 顆按鍵不只是按鍵，而是 16 個可視化控制節點。當你切換 Premiere、Ableton Live、Excel 或 Photoshop，SYNQ App 會即時辨識並自動切換對應佈局、圖示與功能。</p>
+          <ul class="space-y-3 text-sm text-gray-300">
+            <li class="flex items-start gap-3"><span class="text-ice">●</span><span>支援拖拽配置：腳本、組合鍵、巨集一鍵綁定</span></li>
+            <li class="flex items-start gap-3"><span class="text-ice">●</span><span>OLED 可自訂圖示，支援靜態圖與 GIF 動畫</span></li>
+            <li class="flex items-start gap-3"><span class="text-ice">●</span><span>軟體智慧辨識前景程式，免手動切 Profile</span></li>
+          </ul>
+        </div>
+
+        <div data-aos="fade-left" data-aos-duration="950">
+          <div class="glass-card rounded-2xl p-5">
+            <div class="rounded-xl overflow-hidden ice-glow">
+              <img src="assets/img/macro/macro.png" alt="OLED 按鍵視圖" class="w-full h-full object-cover" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider mx-6 md:mx-20"></div>
+
+    <section id="haptic" class="py-24 px-6 max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <div class="order-2 lg:order-1" data-aos="fade-right" data-aos-duration="900">
+          <div class="glass-card rounded-2xl p-6">
+            <p class="text-xs font-mono tracking-widest text-neon mb-3">REAL-TIME MODE FEEDBACK</p>
+            <div class="rounded-xl overflow-hidden">
+              <img src="assets/img/macro/gears.png" alt="旋鈕模組位置示意" class="w-full h-full object-cover" />
+            </div>
+          </div>
+        </div>
+
+        <div class="order-1 lg:order-2" data-aos="fade-left" data-aos-duration="900">
+          <span class="badge bg-neon/10 text-neon border border-neon/20 mb-5 inline-block">Core 02</span>
+          <h2 class="text-4xl md:text-5xl font-black text-white leading-tight mb-5">觸碰數字的<br /><span class="text-neon">厚度</span></h2>
+          <p class="text-gray-300 text-lg leading-relaxed mb-7">中央主控大旋鈕搭載主動式力回饋馬達。剪影片時有底片盤阻尼感，拉音量到上限會有真實撞擊感，不看螢幕也能感知參數狀態。旋鈕內建 OLED 可同步顯示 Timeline Scrub、Brush Size、Volume 等模式。</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="glass-card rounded-xl p-4">
+              <p class="text-xs text-ice font-mono tracking-widest mb-2">VARIABLE HAPTICS</p>
+              <p class="text-sm text-gray-300">依參數類型改變阻尼、刻度與回彈感。</p>
+            </div>
+            <div class="glass-card rounded-xl p-4">
+              <p class="text-xs text-neon font-mono tracking-widest mb-2">OLED STATUS</p>
+              <p class="text-sm text-gray-300">旋鈕螢幕即時顯示當前操作模式。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider mx-6 md:mx-20"></div>
+
+    <section id="modular" class="py-24 px-6 max-w-7xl mx-auto">
+      <div class="mb-12 text-center" data-aos="fade-up">
+        <span class="badge bg-ice/10 text-ice border border-ice/20 mb-4 inline-block">Core 03 + 04</span>
+        <h2 class="text-4xl md:text-5xl font-black text-white">你的桌面，你定義</h2>
+      </div>
+
+      <div class="glass-card rounded-2xl p-6 md:p-8" data-aos="fade-up" data-aos-delay="120">
+        <div class="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 items-start">
+          <div>
+            <h3 class="text-2xl font-bold text-white mb-4" id="dimension">物理模組化佈局 + 多維度控制</h3>
+            <p class="text-gray-300 leading-relaxed mb-6">旋鈕模組可自由卡入按鍵模組的左/右/上/下。你也能單獨拆下旋鈕做精準單點控制。旋鈕本體另集成上下左右方向推動，旋轉與方向輸入可同手完成，特別適合時間軸導航、列表選擇、影格步進。</p>
+
+            <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-300">
+              <li class="border border-white/10 rounded-lg px-4 py-3">卡榫式熱插拔 Snap-Fit 設計</li>
+              <li class="border border-white/10 rounded-lg px-4 py-3">左撇/右撇皆可快速重排</li>
+              <li class="border border-white/10 rounded-lg px-4 py-3">可單獨拆下旋鈕模組使用</li>
+              <li class="border border-white/10 rounded-lg px-4 py-3">360° + 四向推動整合操作</li>
+            </ul>
+          </div>
+
+          <div>
+            <div class="rounded-xl overflow-hidden ice-glow mb-4">
+              <img id="macro-view-image" src="assets/img/macro/macro.png" alt="SYNQ Shift-16 圖片檢視" class="w-full h-full object-cover" />
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+              <button class="view-btn active border border-white/12 rounded-lg py-2 px-2 text-xs text-gray-300 transition-colors" data-src="assets/img/macro/macro.png" data-alt="SYNQ Shift-16 正面圖">正面</button>
+              <button class="view-btn border border-white/12 rounded-lg py-2 px-2 text-xs text-gray-300 transition-colors" data-src="assets/img/macro/croma.png" data-alt="旋鈕可換位示意圖">換位示意</button>
+              <button class="view-btn border border-white/12 rounded-lg py-2 px-2 text-xs text-gray-300 transition-colors" data-src="assets/img/macro/gears.png" data-alt="單獨旋鈕模組圖">單獨旋鈕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider mx-6 md:mx-20"></div>
+
+    <section id="future" class="py-20 px-6 max-w-5xl mx-auto text-center" data-aos="fade-up">
+      <span class="badge bg-neon/10 text-neon border border-neon/20 mb-4 inline-block">Ecosystem</span>
+      <h2 class="text-3xl md:text-4xl font-black text-white mb-5">未來的無限可能</h2>
+      <p class="text-gray-300 text-lg leading-relaxed">這只是 SYNQ 生態系統的開始。更多功能與全新模組正在開發中，敬請期待。</p>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="specs" class="py-24 px-6 max-w-5xl mx-auto">
+      <div class="text-center mb-12" data-aos="fade-up">
+        <span class="badge bg-ice/10 text-ice border border-ice/20 mb-4 inline-block">Specifications</span>
+        <h2 class="text-4xl md:text-5xl font-black text-white">規格概覽</h2>
+      </div>
+
+      <div class="glass-card rounded-2xl p-4 md:p-8" data-aos="fade-up" data-aos-delay="120">
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[680px] text-sm">
+            <thead>
+              <tr class="border-b border-white/10">
+                <th class="text-left text-gray-400 font-mono tracking-widest py-3 px-3">項目</th>
+                <th class="text-left text-gray-400 font-mono tracking-widest py-3 px-3">描述</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="spec-row">
+                <td class="py-4 px-3 text-ice">按鍵矩陣</td>
+                <td class="py-4 px-3 text-gray-200">16 顆 (4×4) 高對比 OLED 自定義螢幕鍵</td>
+              </tr>
+              <tr class="spec-row">
+                <td class="py-4 px-3 text-ice">主控旋鈕</td>
+                <td class="py-4 px-3 text-gray-200">1 組磁浮力回饋大旋鈕（內建 OLED 狀態螢幕）</td>
+              </tr>
+              <tr class="spec-row">
+                <td class="py-4 px-3 text-ice">副控旋鈕</td>
+                <td class="py-4 px-3 text-gray-200">2 組高精度編碼小旋鈕（齒輪傳動感設計）</td>
+              </tr>
+              <tr class="spec-row">
+                <td class="py-4 px-3 text-ice">旋鈕維度</td>
+                <td class="py-4 px-3 text-gray-200">360° 旋轉 + 上下左右 4 方向物理推動</td>
+              </tr>
+              <tr class="spec-row">
+                <td class="py-4 px-3 text-ice">佈局方式</td>
+                <td class="py-4 px-3 text-gray-200">按鍵/旋鈕模組化卡榫熱插拔（可換上下左右位置）</td>
+              </tr>
+              <tr class="spec-row">
+                <td class="py-4 px-3 text-ice">核心軟體</td>
+                <td class="py-4 px-3 text-gray-200">SYNQ App（智能 App 辨識、Layout 自動切換、巨集配置）</td>
+              </tr>
+              <tr class="spec-row">
+                <td class="py-4 px-3 text-ice">連接方式</td>
+                <td class="py-4 px-3 text-gray-200">USB-C（磁吸編織線）/ 藍牙 5.1</td>
+              </tr>
+              <tr class="spec-row">
+                <td class="py-4 px-3 text-ice">尺寸</td>
+                <td class="py-4 px-3 text-gray-200">800 × 600 px 比例優化設計（適合緊湊與專業桌面）</td>
+              </tr>
+              <tr class="spec-row">
+                <td class="py-4 px-3 text-ice">系統支援</td>
+                <td class="py-4 px-3 text-gray-200">macOS / Windows / Linux（支援主流創意與生產力軟體）</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="waitlist" class="py-24 px-6">
+      <div class="max-w-3xl mx-auto text-center" data-aos="fade-up" data-aos-duration="900">
+        <span class="badge bg-neon/10 text-neon border border-neon/20 mb-5 inline-block">Early Access</span>
+        <h2 class="text-4xl md:text-5xl font-black text-white mb-5 leading-tight">加入候補，先上手<br /><span class="text-ice">SYNQ Shift-16</span></h2>
+        <p class="text-gray-400 text-lg mb-10 leading-relaxed">第一時間收到 Beta 軟體、模組擴充與早鳥通知。</p>
+        <form class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto" onsubmit="handleWaitlist(event)">
+          <input
+            type="email"
+            id="waitlist-email"
+            placeholder="your@email.com"
+            required
+            class="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-ice/50 focus:bg-white/10 transition-all duration-300"
+          />
+          <button type="submit" class="btn-waitlist px-7 py-4 rounded-xl text-white font-bold text-sm whitespace-nowrap">Join Now</button>
+        </form>
+        <p id="waitlist-msg" class="mt-4 text-sm text-ice opacity-0 transition-opacity duration-500"></p>
+        <p class="mt-4 text-xs text-gray-600">不會發送垃圾郵件，隨時可取消訂閱。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-white/06 bg-dark">
+    <div class="max-w-7xl mx-auto px-6 py-16">
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 mb-14">
+        <div class="col-span-2 lg:col-span-2">
+          <div class="flex items-center gap-2 mb-5">
+            <div class="w-6 h-6 relative">
+              <div class="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-0.5">
+                <div class="bg-ice rounded-sm"></div>
+                <div class="bg-white/15 rounded-sm"></div>
+                <div class="bg-white/15 rounded-sm"></div>
+                <div class="bg-neon rounded-sm"></div>
+              </div>
+            </div>
+            <span class="text-white font-black text-lg tracking-[0.15em] font-mono">SYNQ</span>
+          </div>
+          <p class="text-gray-500 text-sm leading-relaxed max-w-xs mb-6">
+            次世代 AI 硬體生態系。<br />
+            融合人工智慧與實體觸感，重新定義你與科技的連結。
+          </p>
+          <div class="flex items-center gap-2" aria-label="社群媒體連結">
+            <a href="#" class="social-btn" aria-label="X (Twitter)">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="#" class="social-btn" aria-label="Instagram">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+            </a>
+            <a href="#" class="social-btn" aria-label="YouTube">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </a>
+            <a href="#" class="social-btn" aria-label="GitHub">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-mono font-bold tracking-widest text-gray-500 uppercase mb-5">Products</h4>
+          <ul class="space-y-3">
+            <li><a href="controller.html" class="footer-link">AI Controller</a></li>
+            <li><a href="keyboard.html" class="footer-link">OLED Keyboard</a></li>
+            <li><a href="macro.html" class="footer-link">Macro Deck</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-mono font-bold tracking-widest text-gray-500 uppercase mb-5">Software</h4>
+          <ul class="space-y-3">
+            <li><a href="software.html" class="footer-link">SYNQ Hub</a></li>
+            <li><a href="#" class="footer-link">SDK & API</a></li>
+            <li><a href="#" class="footer-link">Community</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-mono font-bold tracking-widest text-gray-500 uppercase mb-5">Company</h4>
+          <ul class="space-y-3">
+            <li><a href="#" class="footer-link">About</a></li>
+            <li><a href="#" class="footer-link">Press</a></li>
+            <li><a href="#" class="footer-link">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-8 border-t border-white/06 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-xs text-gray-600 font-mono">© 2026 SYNQ Technologies Inc. All rights reserved.</p>
+        <div class="flex items-center gap-6">
+          <a href="#" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">Privacy Policy</a>
+          <a href="#" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">Terms of Service</a>
+          <div class="flex items-center gap-1.5">
+            <div class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
+            <span class="text-xs text-gray-600 font-mono">All Systems Operational</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/script.js"></script>
+  <script>
+    function scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const mainImage = document.getElementById('macro-view-image');
+      const viewButtons = document.querySelectorAll('.view-btn');
+
+      viewButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (!mainImage) return;
+          const src = btn.dataset.src;
+          const alt = btn.dataset.alt || 'SYNQ Shift-16 圖片';
+
+          mainImage.src = src;
+          mainImage.alt = alt;
+
+          viewButtons.forEach((item) => item.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+    });
+  </script>
+</body>
+</html>
