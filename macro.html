@@ -10,46 +10,7 @@
   <script src="js/tailwind-shared.js"></script>
 
   <link rel="stylesheet" href="css/style.css" />
-
-  <style>
-    .signal-grid {
-      background-image:
-        linear-gradient(rgba(94, 230, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(94, 230, 255, 0.05) 1px, transparent 1px);
-      background-size: 28px 28px;
-      mask-image: radial-gradient(circle at center, black 40%, transparent 95%);
-      -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 95%);
-      animation: macro-grid-drift 20s linear infinite, macro-grid-flicker 4.8s steps(5) infinite;
-      opacity: 0.75;
-    }
-
-    @keyframes macro-grid-drift {
-      from { background-position: 0 0, 0 0; }
-      to { background-position: 28px 28px, -28px 28px; }
-    }
-
-    @keyframes macro-grid-flicker {
-      0%, 100% { opacity: 0.55; }
-      25% { opacity: 0.72; }
-      50% { opacity: 0.9; }
-      75% { opacity: 0.66; }
-    }
-
-    .view-btn.active {
-      border-color: rgba(94, 230, 255, 0.5);
-      background: rgba(94, 230, 255, 0.14);
-      color: #dff8ff;
-      box-shadow: 0 0 18px rgba(94, 230, 255, 0.18);
-    }
-
-    .spec-row {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .spec-row:last-child {
-      border-bottom: 0;
-    }
-  </style>
+  <link rel="stylesheet" href="css/pages/macro.css" />
 </head>
 
 <body class="antialiased font-sans">
@@ -163,7 +124,7 @@
         <div data-aos="fade-left" data-aos-duration="950">
           <div class="glass-card rounded-2xl p-5">
             <div class="rounded-xl overflow-hidden ice-glow">
-              <img src="assets/img/macro/macro.png" alt="OLED 按鍵視圖" class="w-full h-full object-cover" />
+              <img src="assets/img/software/2.png" alt="OLED 按鍵視圖" class="w-full h-full object-cover" />
             </div>
           </div>
         </div>
@@ -334,30 +295,6 @@
   <script src="js/script.js"></script>
   <script src="js/layout-templates.js"></script>
   <script src="js/layout.js"></script>
-  <script>
-    function scrollToSection(sectionId) {
-      const section = document.getElementById(sectionId);
-      if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const mainImage = document.getElementById('macro-view-image');
-      const viewButtons = document.querySelectorAll('.view-btn');
-
-      viewButtons.forEach((btn) => {
-        btn.addEventListener('click', () => {
-          if (!mainImage) return;
-          const src = btn.dataset.src;
-          const alt = btn.dataset.alt || 'SYNQ Shift-16 圖片';
-
-          mainImage.src = src;
-          mainImage.alt = alt;
-
-          viewButtons.forEach((item) => item.classList.remove('active'));
-          btn.classList.add('active');
-        });
-      });
-    });
-  </script>
+  <script src="js/pages/macro-page.js"></script>
 </body>
 </html>

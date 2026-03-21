@@ -1,0 +1,5 @@
+.coming-noise {
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(94, 230, 255, 0.12), transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.12), transparent 50%);
+}
