@@ -217,10 +217,9 @@
         </div>
       </div> -->
 
-      <!-- 底部向下滾動提示 -->
-      <div class="absolute bottom-8 inset-x-0 flex justify-center pointer-events-none">
-        <div class="flex flex-col items-center gap-2 animate-bounce"
-             data-aos="fade-up" data-aos-delay="900">
+      <!-- 向下滾動提示（放在圖片下方，不覆蓋圖片） -->
+      <div class="mt-8 flex justify-center pointer-events-none">
+        <div class="flex flex-col items-center gap-2 animate-bounce">
           <span class="text-xs font-mono text-white/30 tracking-widest">SCROLL</span>
           <div class="h-8 w-px bg-gradient-to-b from-ice/40 to-transparent"></div>
         </div>
@@ -288,7 +287,7 @@
               <h3 class="text-lg sm:text-xl leading-tight font-bold text-white">Macro Command Deck</h3>
             </div>
             <p class="text-gray-400 text-xs sm:text-sm leading-relaxed">
-              16 鍵觸覺回饋巨集控制台，配備旋鈕與滑桿，串接 AI 工作流自動化。
+              16 鍵力反饋旋鈕巨集控制台，配備旋鈕與OLED螢幕按鍵，串接 AI 工作流自動化。
             </p>
           </div>
 
@@ -350,30 +349,30 @@
       <div class="flex animate-marquee gap-6 items-center hover:[animation-play-state:paused] cursor-grab active:cursor-grabbing w-max">
         <!-- 原始群組 -->
         <a href="controller.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
-          <img src="assets/img/controller.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
+          <img src="assets/img/controller/front.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
         </a>
         <a href="keyboard.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
-          <img src="assets/img/keyboard.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
+          <img src="assets/img/keyboard/keyboard.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
         </a>
         <a href="macro.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
-          <img src="assets/img/macro.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
+          <img src="assets/img/macro/macro.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
         </a>
-        <a href="coming.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
+        <a href="#waitlist" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
           <img src="assets/img/synth.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
         </a>
 
-        <!-- 複製群組以做完美銜接 (完全相同) -->
+        <!-- 銜接 -->
         <a href="controller.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
-          <img src="assets/img/controller.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
+          <img src="assets/img/controller/back.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
         </a>
         <a href="keyboard.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
-          <img src="assets/img/keyboard.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
+          <img src="assets/img/keyboard/keyboard.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
         </a>
         <a href="macro.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
-          <img src="assets/img/macro.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
+          <img src="assets/img/macro/gears.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
         </a>
-        <a href="coming.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
-          <img src="assets/img/synth.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
+        <a href="macro.html" class="w-[280px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card flex-shrink-0 group relative">
+          <img src="assets/img/macro/croma.png" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out">
         </a>
       </div>
     </section>
