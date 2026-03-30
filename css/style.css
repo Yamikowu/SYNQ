@@ -277,9 +277,6 @@ body::after {
 }
 
 /* --- 6.7 Bento Box 格子大小類別 --- */
-.bento-large  { grid-column: span 1; grid-row: span 1; }
-.bento-medium { grid-column: span 1; }
-
 @media (min-width: 768px) {
   .bento-large  { grid-column: span 2; grid-row: span 2; }
   .bento-medium { grid-column: span 1; }
